@@ -1,0 +1,212 @@
+Skip to content
+HOME
+START HERE
+BASICS
+PL/SQL
+ADVANCED
+FUNCTIONS
+API
+Home » Oracle View » Oracle DROP VIEW
+
+Oracle DROP VIEW
+
+Summary: in this tutorial, you will learn how to use the Oracle DROP VIEW statement to drop a view from the database.
+
+Introduction to Oracle DROP VIEW statement
+To remove a view from the database, you use the following DROP VIEW statement:
+
+DROP VIEW schema_name.view_name 
+[CASCADE CONSTRAINT];
+Code language: SQL (Structured Query Language) (sql)
+1) schema_name
+
+First, you specify the name of schema that contains the view. If you skip the schema name, Oracle assumes that the view is in your own schema.
+
+2) view_name
+
+Second, you specify the name of the view to be dropped. If a view is referenced by other views, materialized views, or synonyms, Oracle will mark these objects INVALID, but does not remove them.
+
+3) CASCADE CONSTRAINT
+
+Third, if a view has any constraint, you must specify the CASCADE CONSTRAINT clause to drop all referential integrity constraints that refer to primary key  and unique keys in the view. If you don’t do so, then the DROP VIEW statement will fail in case such constraints exist.
+
+Oracle DROP VIEW examples
+The following statement creates a view named salesman based on the employees table:
+
+CREATE VIEW salesman AS 
+SELECT
+    *
+FROM
+    employees
+WHERE
+    job_title = 'Sales Representative';
+Code language: SQL (Structured Query Language) (sql)
+The view returns only employees whose job titles are Sales Representative.
+
+SELECT
+    *
+FROM
+    salesman;
+Code language: SQL (Structured Query Language) (sql)
+Oracle DROP VIEW - salesman view
+The following statement creates another view named salesman_contacts based on the salesman view:
+
+CREATE VIEW salesman_contacts AS 
+SELECT
+    first_name,
+    last_name,
+    email,
+    phone
+FROM
+    salesman;
+Code language: SQL (Structured Query Language) (sql)
+The salesman_contacts view returns the only name, email, and phone of the salesman:
+
+SELECT
+    *
+FROM
+    salesman_contacts;
+Code language: SQL (Structured Query Language) (sql)
+Oracle DROP VIEW - salesman_contacts view
+To drop the salesman view, you use the following statement:
+
+DROP VIEW salesman;
+Code language: SQL (Structured Query Language) (sql)
+Because the salesman_contacts view is dependent on the salesman view, it became invalid when the salesman view was dropped.
+
+You can check the status of a view by querying data from the user_objects view. Note that the object name must be in uppercase.
+
+SELECT
+    object_name,
+    status
+FROM
+    user_objects
+WHERE
+    object_type = 'VIEW'
+    AND object_name = 'SALESMAN_CONTACTS';
+Code language: SQL (Structured Query Language) (sql)
+Oracle DROP VIEW - Invalid View
+As you can see, the status of the salesman_contacts view is INVALID.
+
+To drop the salesman_contacts view, you use the following DROP VIEW statement:
+
+DROP VIEW salesman_contacts;
+Code language: SQL (Structured Query Language) (sql)
+In this tutorial, you have learned how to use the Oracle DROP VIEW statement to drop a view from a database.
+
+Was this tutorial helpful? 
+
+Oracle CREATE VIEW
+PREVIOUSLY
+Oracle CREATE VIEW
+UP NEXT
+Oracle Updatable View
+Oracle Updatable View
+Search for:
+Search …
+GETTING STARTED
+What Is Oracle Database
+Install Oracle Database Server
+Download Oracle Sample Database
+Create Oracle Sample Database
+Connect To Oracle Database Server
+
+ORACLE DATA MANIPULATION
+SELECT
+Oracle DUAL Table
+ORDER BY
+SELECT DISTINCT
+WHERE
+Table & Column Aliases
+AND
+OR
+FETCH
+BETWEEN
+IN
+LIKE
+IS NULL
+Joins
+INNER JOIN
+LEFT JOIN
+RIGHT JOIN
+FULL OUTER JOIN
+CROSS JOIN
+Self Join
+GROUP BY
+HAVING
+UNION
+INTERSECT
+MINUS
+GROUPING SETS
+CUBE
+ROLLUP
+PIVOT
+UNPIVOT
+INSERT
+INSERT INTO SELECT
+INSERT ALL
+UPDATE
+DELETE
+MERGE
+Subquery
+Correlated Subquery
+EXISTS
+NOT EXISTS
+ANY
+ALL
+ORACLE DATA TYPES
+Oracle Data Types
+NUMBER
+FLOAT
+BINARY_FLOAT
+CHAR
+NCHAR
+VARCHAR2
+NVARCHAR2
+DATE
+INTERVAL
+TIMESTAMP
+TIMESTAMP WITH TIME ZONE
+ORACLE DATA DEFINITION
+CREATE TABLE
+Identity Column
+ALTER TABLE
+ALTER TABLE ADD Column
+ALTER TABLE MODIFY Column
+Drop Columns
+DROP TABLE
+TRUNCATE TABLE
+RENAME Table
+Oracle Virtual Column
+ORACLE CONSTRAINTS
+PRIMARY KEY
+FOREIGN KEY
+UNIQUE
+CHECK
+NOT NULL
+ORACLE VIEWS
+CREATE VIEW
+DROP VIEW
+Updatable Views
+Inline Views
+WITH CHECK OPTION
+ABOUT ORACLE TUTORIAL
+OracleTututorial.com website provides Developers and Database Administrators with the updated Oracle tutorials, scripts, and tips.
+SEARCH
+Search for:
+Search …
+LATEST TUTORIALS
+Oracle Implicit Statement Results
+Calling PL/SQL Stored Functions in Python
+Calling PL/SQL Procedures in Python
+Managing Transaction in Python
+Deleting Data From Oracle Database in Python
+SITE LINKS
+Donation ❤️
+Oracle Books
+About
+Contact
+Privacy Policy
+Terms of Use
+Copyright © 2021 Oracle Tutorial. All Rights Reserved.
+The tutorials on oracletutorial.com are not sponsored by the Oracle Corp and this website has no relationship with the Oracle Corp.

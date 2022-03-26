@@ -1,0 +1,272 @@
+Oracle WITH CHECK OPTION
+==============================
+
+Skip to content
+HOME
+START HERE
+BASICS
+PL/SQL
+ADVANCED
+FUNCTIONS
+API
+Home » Oracle View » Oracle WITH CHECK OPTION
+
+Oracle WITH CHECK OPTION
+
+Summary: in this tutorial, you will learn to use the Oracle WITH CHECK OPTION clause to ensure the view’s consistency.
+
+Oracle WITH CHECK OPTION clause
+The WITH CHECK OPTION clause is used for an updatable view to prohibits the changes to the view that would produce rows which are not included in the defining query.
+
+The following statement creates a view that has rows meet the condition of the WHERE clause.
+
+CREATE
+    VIEW view_name AS SELECT
+        *
+    FROM
+        table_name
+    WHERE
+        condition;
+Code language: SQL (Structured Query Language) (sql)
+In case the view is updatable, you can update the rows to make them invisible in the view or you can insert new rows which make the condition in the WHERE clause not true.
+
+To prevent the invisible rows from being updated to non-visible rows, you use the WITH CHECK OPTION clause:
+
+CREATE
+    VIEW view_name AS SELECT
+        *
+    FROM
+        table_name
+    WHERE
+        condition WITH CHECK OPTION;
+Code language: SQL (Structured Query Language) (sql)
+Oracle WITH CHECK OPTION example
+We will use the brands and cars tables created in the updatable view tutorial for the demonstration.
+
+Oracle Updatable View - Sample Tables
+The following pictures illustrate the data in the brands and cars tables:
+
+SELECT
+	*
+FROM
+	brands;
+Code language: SQL (Structured Query Language) (sql)
+Oracle WITH CHECK OPTION - brands table
+SELECT
+	*
+FROM
+	cars;
+Code language: SQL (Structured Query Language) (sql)
+Oracle WITH CHECK OPTION - cars table
+The following statement creates audi_cars view that returns only Audi cars:
+
+CREATE
+    VIEW audi_cars AS SELECT
+        car_id,
+        car_name,
+        brand_id
+    FROM
+        cars
+    WHERE
+        brand_id = 1;
+Code language: SQL (Structured Query Language) (sql)
+The following query returns the data from the audi_cars view:
+
+SELECT
+    *
+FROM
+    audi_cars;
+Code language: SQL (Structured Query Language) (sql)
+Oracle WITH CHECK OPTION - audi_cars view
+The audi_cars is an updatable view so you can insert a new row into the cars table through it:
+
+INSERT
+    INTO
+        audi_cars(
+            car_name,
+            brand_id
+        )
+    VALUES(
+        'BMW Z3 coupe',
+        2
+    ); 
+Code language: SQL (Structured Query Language) (sql)
+The statement inserted a row which makes the condition in the WHERE clause ( brand_id = 1) not true.
+
+You can also make the visible rows in the view invisible by updating the data in the underlying base table through the view as shown in the following example:
+
+UPDATE
+    audi_cars
+SET
+    car_name = 'BMW 1-serie Coupe',
+    brand_id = 2
+WHERE
+    car_id = 3;
+Code language: SQL (Structured Query Language) (sql)
+This statement changed both brand and name of a car with id 3 from Audi to BMW that make the row invisible in the view.
+
+SELECT
+    *
+FROM
+    audi_cars;
+Code language: SQL (Structured Query Language) (sql)
+Oracle WITH CHECK OPTION - audi_cars view updated
+Let’s create another updatable view named ford_cars that has the WITH CHECK OPTION clause:
+
+CREATE
+    VIEW ford_cars AS SELECT
+        car_id,
+        car_name,
+        brand_id
+    FROM
+        cars
+    WHERE
+        brand_id = 3 WITH CHECK OPTION;
+Code language: SQL (Structured Query Language) (sql)
+The following statement inserts an Audi car into the cars table through the ford_cars view:
+
+INSERT
+    INTO
+        ford_cars(
+            car_name,
+            brand_id
+        )
+    VALUES(
+        'Audi RS6 Avant',
+        1
+    );
+Code language: SQL (Structured Query Language) (sql)
+Unlike the audi_cars view, Oracle issued the following error in this case:
+
+SQL Error: ORA-01402: view WITH CHECK OPTION where-clause violation
+Code language: SQL (Structured Query Language) (sql)
+Because the INSERT statement attempted to insert a row that causes a view WITH CHECK OPTION where-clause violation
+
+Similarly, the following UPDATE statement also fails to update because of the where-clause violation.
+
+UPDATE
+    ford_cars
+SET
+    brand_id = 4,
+    car_name = 'Honda NSX'
+WHERE
+    car_id = 6;
+Code language: SQL (Structured Query Language) (sql)
+In this tutorial, you have learned how to use the Oracle WITH CHECK OPTION clause in the CREATE VIEW statement to ensure the view’s consistency.
+
+Was this tutorial helpful? 
+
+The Basics of Inline View in Oracle
+PREVIOUSLY
+The Basics of Inline View in Oracle
+UP NEXT
+Oracle Index
+Oracle Index
+Search for:
+Search …
+GETTING STARTED
+What Is Oracle Database
+Install Oracle Database Server
+Download Oracle Sample Database
+Create Oracle Sample Database
+Connect To Oracle Database Server
+
+ORACLE DATA MANIPULATION
+SELECT
+Oracle DUAL Table
+ORDER BY
+SELECT DISTINCT
+WHERE
+Table & Column Aliases
+AND
+OR
+FETCH
+BETWEEN
+IN
+LIKE
+IS NULL
+Joins
+INNER JOIN
+LEFT JOIN
+RIGHT JOIN
+FULL OUTER JOIN
+CROSS JOIN
+Self Join
+GROUP BY
+HAVING
+UNION
+INTERSECT
+MINUS
+GROUPING SETS
+CUBE
+ROLLUP
+PIVOT
+UNPIVOT
+INSERT
+INSERT INTO SELECT
+INSERT ALL
+UPDATE
+DELETE
+MERGE
+Subquery
+Correlated Subquery
+EXISTS
+NOT EXISTS
+ANY
+ALL
+ORACLE DATA TYPES
+Oracle Data Types
+NUMBER
+FLOAT
+BINARY_FLOAT
+CHAR
+NCHAR
+VARCHAR2
+NVARCHAR2
+DATE
+INTERVAL
+TIMESTAMP
+TIMESTAMP WITH TIME ZONE
+ORACLE DATA DEFINITION
+CREATE TABLE
+Identity Column
+ALTER TABLE
+ALTER TABLE ADD Column
+ALTER TABLE MODIFY Column
+Drop Columns
+DROP TABLE
+TRUNCATE TABLE
+RENAME Table
+Oracle Virtual Column
+ORACLE CONSTRAINTS
+PRIMARY KEY
+FOREIGN KEY
+UNIQUE
+CHECK
+NOT NULL
+ORACLE VIEWS
+CREATE VIEW
+DROP VIEW
+Updatable Views
+Inline Views
+WITH CHECK OPTION
+ABOUT ORACLE TUTORIAL
+OracleTututorial.com website provides Developers and Database Administrators with the updated Oracle tutorials, scripts, and tips.
+SEARCH
+Search for:
+Search …
+LATEST TUTORIALS
+Oracle Implicit Statement Results
+Calling PL/SQL Stored Functions in Python
+Calling PL/SQL Procedures in Python
+Managing Transaction in Python
+Deleting Data From Oracle Database in Python
+SITE LINKS
+Donation ❤️
+Oracle Books
+About
+Contact
+Privacy Policy
+Terms of Use
+Copyright © 2021 Oracle Tutorial. All Rights Reserved.
+The tutorials on oracletutorial.com are not sponsored by the Oracle Corp and this website has no relationship with the Oracle Corp.

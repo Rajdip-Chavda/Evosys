@@ -1,0 +1,120 @@
+Database: 
+Base: 
+Data:collection of process  information/ Facts/Homegenous(similar)/observations we are doing
+process : 
+1. type of data:phonenumber:nueric|name:alphanumeric|company|email}Contact
+2. validation:a79333a
+3. storing
+4. view
+5. update
+6. delete
+RDBMS : Relation DBMS
+Relation: Table
+			set Rows
+			 fix set columns[datatype] null|not null
+pid,pname,price,brand -> Product
+set :collection unique 
+====================================================
+key->orderid+productname
+purchase_quantity->orderid+productname
+--------------------------
+orderdate->orderid
+customername->orderid
+address->orderid
+order_total_amount->orderid
+---------------------------
+unitprice->productname
+=====================================
+2nf 1nf+all fields fully functionally dependent on primary key
+
+1. Product(pid,pname,unitprice,instock)
+2. Orders(orderid,orderdate,ordretotalamount,customer,address)
+3. OrderItem(orderid,pid,purchasequantity)
+=====================================
+3nf 1Nf+2nf+No transitivity 
+A->B->C ==>A->C Transitivity
+Orders(orderid,orderdate,ordretotalamount,customer,address)
+orderid->customer
+customer->address
+[orderid->address]
+Customer (customerid,customername,address)
+orders(orderid,orderdate,ordretotalamount,customerid)
+or
+customerorderdetails(orderid,customerid)
+=====================================
+Barcode 
+
+========================================
+Database
+RDBMS
+	Relations[Table(Set Rows(set columns))]
+Denormalize & Normalize (1NF|2NF|3Nf)
+No-SQL=>Not Only SQL 
+Denormalize data
+1. documentation
+2. columns
+3. graph	
+
+Akash Rawat (Yashwardhan,Shivani,Dhwani,Sakshi)
+Yashwardhan (Akash Rawat,Sakshi)
+Sakshi(Akash Rawat,Yashwardhan,Shivani,Dhwani,Pooja)
+every row there is different record
+every row has different no of friends in friendlist
+
+facebook_profile,frinedslist(0,1,...n)
+facebook_post,likes(0,1,...n),dislikes(0,1,..n)
+
+Data not only increasing vertically but it may increase horizontally
+post,like1,like2,......,dislike1,dislike2.....
+profile,friend1,friend2,friend3,....
+Akash Rawat (Yashwardhan,Shivani,Dhwani,Sakshi)
+Yashwardhan (Akash Rawat,Sakshi)
+Sakshi(Akash Rawat,Yashwardhan,Shivani,Dhwani,Pooja)
+
+RDBMS->Vertical expansion
+NoSQL->Horizontally 
+=============================================
+Oracle SQL->RDBMS
+SQL ->  Structured Query Language 
+DDL -> Data Definition Language
+	   CREATE,ALTER,DROP,TRUNCATE
+DML => Data Manipulation Languge
+	   INSERT,UPDATE,DELETE	
+DQL -> Data Query Language 
+	   SELECT,FROM,WHERE,ORDER BY, GROUP BY,
+	   OPERATORS ->LIKE,IN,BETWEEN,AS,IS NULL, DISTINCT,EXIST,ANY,ALL
+		ARITHMATIC,LOGICAL,COMPARISON
+	   CONDITIONA STATEMENT : IF ELSE,CASE WHEN THEN
+	   LOOP : LOOP WHILE
+	   SUBQUERY,
+	   JOINS
+	   VIEW	   
+TCL -> Transactions 
+		COMMIT,SAVE POINT, ROLLBACK
+DCL -> GRANT,REVOKE
+=====================================================
+DATABASE -> CREATE DATABASE
+DATABASE: hr[[EMP] ,[DEPT], [BRANCH]]
+
+1. FUNCTIONS Names Mysql and Oracle 
+2. Oracle(object)	mysql			
+	datatypes 
+	sequence 		autoincrement
+	syntax constraints
+	functions
+
+SQL : ms sql,oracle,mysql,postgre,mongo,neo4j,cassandra,redis
+=========================================================
+Server:localhost=>127.0.0.1:1521:xe[database}
+port
+
+ip 
+classA 127 ClassB
+0-126  128-
+
+Khadija->purchase
+	   ->customer 	
+Aditya->customer
+
+
+

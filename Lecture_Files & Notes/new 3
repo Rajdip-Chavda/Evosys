@@ -1,0 +1,275 @@
+Skip to content
+HOME
+START HERE
+BASICS
+PL/SQL
+ADVANCED
+FUNCTIONS
+API
+Home » Oracle View
+
+Oracle View
+
+This section covers Oracle View which is an essential component in Oracle Database.
+
+Introduction to the Oracle View
+The result of a query is a derived table as shown in the following example:
+
+SELECT
+    name,
+    credit_limit
+FROM
+    customers;
+Code language: SQL (Structured Query Language) (sql)
+Oracle View example
+The derived table consists of the name and credit limit (credit_limit) columns with many rows. It contains only partial data from the customers table.
+
+If you give this query a name, then you have a view. This is why sometimes a view is referred to as a named query.
+
+So by definition, a view is a “virtual” table whose data is the result of a stored query, which is derived each time when you query against the view.
+
+A view is a virtual table because you can use it like a table in your SQL queries. Every view has columns with data types so you can execute a query against views or manage their contents (with some restrictions) using the INSERT, UPDATE, DELETE, and MERGE statements.
+
+Unlike a table, a view does not store any data. To be precise, a view only behaves like a table. And it is just a named query stored in the database. When you query data from a view, Oracle uses this stored query to retrieve the data from the underlying tables.
+
+Suppose, we assign the query above a name called customer_credits and query data from this view:
+
+SELECT
+  *
+FROM
+  customer_credits;
+Code language: SQL (Structured Query Language) (sql)
+Behind the scenes, Oracle finds the stored query associated with the name customer_credits and executes the following query:
+
+SELECT
+    *
+FROM
+    (
+        SELECT
+            name,
+            credit_limit
+        FROM
+            customers
+    );  
+Code language: SQL (Structured Query Language) (sql)
+In this example, the customers table is called the base table. Also, a query that defines the view is called a defining query.
+
+The result set returned from the customer_credits view depends on the data of the underlying table, which is the customers table in this case. The customer_credits view is also dependent on the structure of the customers table. If you rename or drop one of the columns referenced by the query such as name or credit_limit, the view customer_credits will not work anymore.
+
+When to use the Oracle view
+You can use views in many cases for different purposes. The most common uses of views are as follows:
+
+Simplifying data retrieval.
+Maintaining logical data independence.
+Implementing data security.
+Simplifying data retrieval
+Views help simplify data retrieval significantly. First, you build a complex query, test it carefully, and encapsulate the query in a view. Then, you can access the data of the underlying tables through the view instead of rewriting the whole query again and again.
+
+The following query returns sales amount by the customer by year:
+
+SELECT
+    name AS customer,
+    SUM( quantity * unit_price ) sales_amount,
+    EXTRACT(
+        YEAR
+    FROM
+        order_date
+    ) YEAR
+FROM
+    orders
+INNER JOIN order_items
+        USING(order_id)
+INNER JOIN customers
+        USING(customer_id)
+WHERE
+    status = 'Shipped'
+GROUP BY
+    name,
+    EXTRACT(
+        YEAR
+    FROM
+        order_date
+    );
+Code language: SQL (Structured Query Language) (sql)
+Oracle View - Customer Sales Example
+This query is quite complex. Typing it over and over again is time-consuming and potentially cause a mistake. To simplify it, you can create a view based on this query:
+
+CREATE OR REPLACE VIEW customer_sales AS 
+SELECT
+    name AS customer,
+    SUM( quantity * unit_price ) sales_amount,
+    EXTRACT(
+        YEAR
+    FROM
+        order_date
+    ) YEAR
+FROM
+    orders
+INNER JOIN order_items
+        USING(order_id)
+INNER JOIN customers
+        USING(customer_id)
+WHERE
+    status = 'Shipped'
+GROUP BY
+    name,
+    EXTRACT(
+        YEAR
+    FROM
+        order_date
+    );
+Code language: SQL (Structured Query Language) (sql)
+By adding the following clause:
+
+CREATE OR REPLACE VIEW customer_sales AS
+Code language: SQL (Structured Query Language) (sql)
+before the query, you create the customer_sales view. Note that you will learn how to create views in the next tutorial.
+
+Now, you can easily retrieve the sales by the customer in 2017 with a more simple query:
+
+SELECT
+    customer,
+    sales_amount
+FROM
+    customer_sales
+WHERE
+    YEAR = 2017
+ORDER BY
+    sales_amount DESC;
+Code language: SQL (Structured Query Language) (sql)
+Oracle View - Simplifying Data Access
+Maintaining logical data independence
+You can expose the data from underlying tables to the external applications via views. Whenever the structures of the base tables change, you just need to update the view. The interface between the database and the external applications remains intact. The beauty is that you don’t have to change a single line of code to keep the external applications up and running.
+
+For example, some reporting systems may need only customer sales data for composing strategic reports. Hence, you can give the application owners the customer_sales view.
+
+Implementing data security
+Views allow you to implement an additional security layer. They help you hide certain columns and rows from the underlying tables and expose only needed data to the appropriate users.
+
+Oracle provides you the with GRANT and REVOKE commands on views so that you can specify which actions a user can perform against the view. Note that in this case, you don’t grant any privileges on the underlying tables because you may not want the user to bypass the views and access the base tables directly.
+
+More on Oracle View
+Follow the tutorials below to learn more about the Oracle View:
+
+Creating a view – use the CREATE VIEW statement to create a new view.
+Drop a view – use the DROP VIEW statement to drop a view from the database.
+Updatable views – discuss how to create updatable views.
+Inline views – learn how to use inline views to simplify complex queries and condense several separate queries into one query.
+WITH CHECK OPTION – how to protect the view using the WITH CHECK OPTION clause of the CREATE VIEW command.
+Materialized view – covers the materialized views that help you improve query response times.
+Was this tutorial helpful? 
+
+How to Compare Two Rows in Same Table in Oracle
+PREVIOUSLY
+How to Compare Two Rows in Same Table in Oracle
+UP NEXT
+Oracle CREATE VIEW
+Oracle CREATE VIEW
+Search for:
+Search …
+GETTING STARTED
+What Is Oracle Database
+Install Oracle Database Server
+Download Oracle Sample Database
+Create Oracle Sample Database
+Connect To Oracle Database Server
+
+ORACLE DATA MANIPULATION
+SELECT
+Oracle DUAL Table
+ORDER BY
+SELECT DISTINCT
+WHERE
+Table & Column Aliases
+AND
+OR
+FETCH
+BETWEEN
+IN
+LIKE
+IS NULL
+Joins
+INNER JOIN
+LEFT JOIN
+RIGHT JOIN
+FULL OUTER JOIN
+CROSS JOIN
+Self Join
+GROUP BY
+HAVING
+UNION
+INTERSECT
+MINUS
+GROUPING SETS
+CUBE
+ROLLUP
+PIVOT
+UNPIVOT
+INSERT
+INSERT INTO SELECT
+INSERT ALL
+UPDATE
+DELETE
+MERGE
+Subquery
+Correlated Subquery
+EXISTS
+NOT EXISTS
+ANY
+ALL
+ORACLE DATA TYPES
+Oracle Data Types
+NUMBER
+FLOAT
+BINARY_FLOAT
+CHAR
+NCHAR
+VARCHAR2
+NVARCHAR2
+DATE
+INTERVAL
+TIMESTAMP
+TIMESTAMP WITH TIME ZONE
+ORACLE DATA DEFINITION
+CREATE TABLE
+Identity Column
+ALTER TABLE
+ALTER TABLE ADD Column
+ALTER TABLE MODIFY Column
+Drop Columns
+DROP TABLE
+TRUNCATE TABLE
+RENAME Table
+Oracle Virtual Column
+ORACLE CONSTRAINTS
+PRIMARY KEY
+FOREIGN KEY
+UNIQUE
+CHECK
+NOT NULL
+ORACLE VIEWS
+CREATE VIEW
+DROP VIEW
+Updatable Views
+Inline Views
+WITH CHECK OPTION
+ABOUT ORACLE TUTORIAL
+OracleTututorial.com website provides Developers and Database Administrators with the updated Oracle tutorials, scripts, and tips.
+SEARCH
+Search for:
+Search …
+LATEST TUTORIALS
+Oracle Implicit Statement Results
+Calling PL/SQL Stored Functions in Python
+Calling PL/SQL Procedures in Python
+Managing Transaction in Python
+Deleting Data From Oracle Database in Python
+SITE LINKS
+Donation ❤️
+Oracle Books
+About
+Contact
+Privacy Policy
+Terms of Use
+Copyright © 2021 Oracle Tutorial. All Rights Reserved.
+The tutorials on oracletutorial.com are not sponsored by the Oracle Corp and this website has no relationship with the Oracle Corp.

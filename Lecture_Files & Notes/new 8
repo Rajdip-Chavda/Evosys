@@ -1,0 +1,287 @@
+ Skip to content
+HOME
+START HERE
+BASICS
+PL/SQL
+ADVANCED
+FUNCTIONS
+API
+Home » Oracle View » The Basics of Inline View in Oracle
+
+The Basics of Inline View in Oracle
+
+Summary: in this tutorial, you will learn about the inline view in Oracle and how to use them to simplify complex queries or condense several separate queries into one.
+
+Introduction to the inline view in Oracle
+An inline view is not a real view but a subquery in the FROM clause of a SELECT statement. Consider the following SELECT statement:
+
+SELECT
+    column_list
+FROM
+    table;
+Code language: SQL (Structured Query Language) (sql)
+In the FROM clause, you can specify a table from which you want to query data. Besides a table, you can use a subquery as shown in the following example:
+
+SELECT
+    column_list
+FROM
+    (
+        SELECT
+            *
+        FROM
+            table_name
+    ) t;
+Code language: SQL (Structured Query Language) (sql)
+The subquery specified in the FROM clause of a query is called an inline view. Because an inline view can replace a table in a query, it is also called a derived table. Sometimes, you may hear the term subselect, which is the same meaning as the inline view.
+
+You often use the inline view in Oracle to simplify complex queries by eliminating join operations or condensing separate queries into a single query.
+
+Oracle inline view example
+Let’s use the products table in the sample database for the demonstration.
+
+products table
+A) simple Oracle inline view example
+The following query retrieves the top 10 most expensive products from the products table:
+
+SELECT
+    *
+FROM
+    (
+        SELECT
+            product_id,
+            product_name,
+            list_price
+        FROM
+            products
+        ORDER BY
+            list_price DESC
+    )
+WHERE
+    ROWNUM <= 10;
+Code language: SQL (Structured Query Language) (sql)
+oracle inline view example
+In this example, first, the inline view returns all products sorted by list prices in descending order. And then the outer query retrieves the first 10 rows from the inline view.
+
+B) Inline view joins with a table example
+The following example joins an inline view with a table in the FROM clause. It returns the product categories and the highest list price of products in each category:
+
+SELECT
+    category_name,
+    max_list_price
+FROM
+    product_categories a,
+    (
+        SELECT
+            category_id,
+            MAX( list_price ) max_list_price
+        FROM
+            products
+        GROUP BY
+            category_id
+    ) b
+WHERE
+    a.category_id = b.category_id
+ORDER BY
+    category_name;
+Code language: SQL (Structured Query Language) (sql)
+oracle inline view and join
+In this example, the inline view returns the category id list and the highest list price of product in each category. The outer query joins the inline view with the product_categories table to get the category name.
+
+C) LATERAL inline view example
+Consider the following statement:
+
+SELECT
+    category_name,
+    product_name
+FROM
+    products p,
+    (
+        SELECT
+            *
+        FROM
+            product_categories c
+        WHERE
+            c.category_id = p.category_id
+    )
+ORDER BY
+    product_name;
+Code language: SQL (Structured Query Language) (sql)
+Oracle issued an error:
+
+ORA-00904: "P"."CATEGORY_ID": invalid identifier
+Code language: SQL (Structured Query Language) (sql)
+This is because the inline view cannot reference the tables from the outside of its definition.
+
+Fortunately, since Oracle 12c, by using the LATERAL keyword, an inline view can reference the table on the left of the inline view definition in the FROM clause as shown in the following example:
+
+SELECT
+    product_name,
+    category_name
+FROM
+    products p,
+    LATERAL(
+        SELECT
+            *
+        FROM
+            product_categories c
+        WHERE
+            c.category_id = p.category_id
+    )
+ORDER BY
+    product_name;
+Code language: SQL (Structured Query Language) (sql)
+oracle inline view - LATERAL
+Note that the LATERAL inline views are subject to some restrictions listed in the documentation.
+
+D) Oracle inline view: data manipulation examples
+You can issue data manipulation statement such as INSERT, UPDATE, and DELETE against updatable inline view.
+
+For example, the following statement increases the list prices of CPU products by 15%:
+
+UPDATE
+    (
+        SELECT
+            list_price
+        FROM
+            products
+        INNER JOIN product_categories using (category_id)
+        WHERE
+            category_name = 'CPU'
+    )
+SET
+    list_price = list_price * 1.15; 
+Code language: SQL (Structured Query Language) (sql)
+And the following example deletes all video cards with the list price less than 1,000:
+
+DELETE
+    (
+        SELECT
+            list_price
+        FROM
+            products
+        INNER JOIN product_categories
+                USING(category_id)
+        WHERE
+            category_name = 'Video Card'
+    )
+WHERE
+    list_price < 1000; 
+Code language: SQL (Structured Query Language) (sql)
+In this tutorial, you have learned about the inline view in Oracle to simplify complex queries and condense several separate queries into one query.
+
+Was this tutorial helpful? 
+
+Oracle Updatable View
+PREVIOUSLY
+Oracle Updatable View
+UP NEXT
+Oracle WITH CHECK OPTION
+Oracle WITH CHECK OPTION
+Search for:
+Search …
+GETTING STARTED
+What Is Oracle Database
+Install Oracle Database Server
+Download Oracle Sample Database
+Create Oracle Sample Database
+Connect To Oracle Database Server
+
+ORACLE DATA MANIPULATION
+SELECT
+Oracle DUAL Table
+ORDER BY
+SELECT DISTINCT
+WHERE
+Table & Column Aliases
+AND
+OR
+FETCH
+BETWEEN
+IN
+LIKE
+IS NULL
+Joins
+INNER JOIN
+LEFT JOIN
+RIGHT JOIN
+FULL OUTER JOIN
+CROSS JOIN
+Self Join
+GROUP BY
+HAVING
+UNION
+INTERSECT
+MINUS
+GROUPING SETS
+CUBE
+ROLLUP
+PIVOT
+UNPIVOT
+INSERT
+INSERT INTO SELECT
+INSERT ALL
+UPDATE
+DELETE
+MERGE
+Subquery
+Correlated Subquery
+EXISTS
+NOT EXISTS
+ANY
+ALL
+ORACLE DATA TYPES
+Oracle Data Types
+NUMBER
+FLOAT
+BINARY_FLOAT
+CHAR
+NCHAR
+VARCHAR2
+NVARCHAR2
+DATE
+INTERVAL
+TIMESTAMP
+TIMESTAMP WITH TIME ZONE
+ORACLE DATA DEFINITION
+CREATE TABLE
+Identity Column
+ALTER TABLE
+ALTER TABLE ADD Column
+ALTER TABLE MODIFY Column
+Drop Columns
+DROP TABLE
+TRUNCATE TABLE
+RENAME Table
+Oracle Virtual Column
+ORACLE CONSTRAINTS
+PRIMARY KEY
+FOREIGN KEY
+UNIQUE
+CHECK
+NOT NULL
+ORACLE VIEWS
+CREATE VIEW
+DROP VIEW
+Updatable Views
+Inline Views
+WITH CHECK OPTION
+ABOUT ORACLE TUTORIAL
+OracleTututorial.com website provides Developers and Database Administrators with the updated Oracle tutorials, scripts, and tips.
+SEARCH
+Search for:
+Search …
+LATEST TUTORIALS
+Oracle Implicit Statement Results
+Calling PL/SQL Stored Functions in Python
+Calling PL/SQL Procedures in Python
+Managing Transaction in Python
+Deleting Data From Oracle Database in Python
+SITE LINKS
+Donation ❤️
+Oracle Books
+About
+Contact
+Privacy Policy
+Terms of Use
+Copyright © 2021 Oracle Tutorial. All Rights Reserved.
+The tutorials on oracletutorial.com are not sponsored by the Oracle Corp and this website has no relationship with the Oracle Corp.

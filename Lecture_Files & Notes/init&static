@@ -1,0 +1,95 @@
+Init block :
+-- init method is a predefind method to initalize an object after its creation.
+-- init method is a life cycle method for servlet for java. it is started by the browser when java program is loaded and run by th browser.
+-- an instance intitalization block is only executed when there is a call to the constructor for creating an object.
+-- it is also called empty block
+-- the intializer block is used to initalize instance data member. the intializer block is executed whenever an onject is created. the intializer block is copied into java cmpiler and then to every constructors. the intitalizationblock is executed before the code in the constructor.
+
+
+Static block:
+-- Static block is a set of instructions that is run only once when a class is loaded into memory.
+-- Static block is also called static initialization block
+-- Static initialization block loaded as soon as a class loads and it is not associated with a call to the constructor of a class for object creation 
+-- static block is an option for initializing or setting up the class at runtime.
+-- static block is executed before the main() method 
+
+the static block is only loaded when the class object is created by the jvm for the 1st time 
+whereas 
+init{} block is loaded every time class object is created 
+
+example1
+
+public class blocks 
+{
+	static 
+	{
+		System.out.println("inside static block");
+	}
+	
+	{
+		System.out.println("inside the inti or instance intitalization block");
+	}
+	public static void main(String args[])
+	{
+		new blocks();
+		new blocks();
+		new blocks();
+	}
+}
+output :
+inside static block
+inside the inti or instance intitalization block
+inside the inti or instance intitalization block
+inside the inti or instance intitalization block
+
+
+example2
+public class one extends two
+{
+	static 
+	{
+		System.out.println("inside static block");
+	}
+	one()
+	{
+		System.out.println("inside constructor of child");
+	}
+	
+	{
+		system.out.println("inside initialization block");
+	}
+	
+	public static void main(String args[])
+	{
+		new one();
+		new one();
+		System.out.println("inside main");
+	}
+}
+class two 
+{
+	static
+	{
+		System.out.println("inside parent static block");
+	}
+	
+	{
+		System.ot.println("inside parent initialization block");
+	}
+	two()
+	{
+		System.out.println("inside parent constructor");
+	}
+}
+output:
+inside parent static block
+inside static block
+inside parent initialization block
+inside parent constructor
+inside initialization block
+inside constructor of child
+inside parent initialization block
+inside parent constructor
+inside initialization block
+inside constructor of child
+inside main

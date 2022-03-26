@@ -1,0 +1,2008 @@
+ #### 31-Jan-22
+Agenda: 
+1. DDL Create User c##<> identified by <passoword>
+2. DCL -> Grant permission to the custom user
+3. Tablespace in oracle 
+4. DDL -> creating tables dept, branch, emp + DML (insert ) +TCL (commit)
+5. DQL -> Select, From, Where, Order by
+========================================================================================
+BankAccount-> accountNo->IFSC code->Amount->IMPS/RTGS/NEFT
+Authentication -> you have account ->you login to app and view balance
+Autherization  -> transfering money is allowed 
+Database -> User + role 
+Sys as sysdba-> it has all permissions 
+create,delete,modify we must have an access to drive
+Data Control Language : GRANT and Revoke
+=========================================
+-- To display currently open account in Oracle
+-- if user not created only then use this : create user c##erpuser identified by root;
+
+SELECT 
+		username, 
+		default_tablespace, 
+		profile, 
+		authentication_type
+	FROM
+		dba_users 
+	WHERE 
+		account_status = 'OPEN'
+	ORDER BY
+		username;
+-- ------------------------------------------------------------------------------------	
+-- 2. Grant Control
+-- ------------------------------------------------------------------------------------
+GRANT create session TO c##erpuser;
+GRANT create table TO  c##erpuser;
+GRANT create view TO c##erpuser;
+GRANT create any trigger TO c##erpuser;
+GRANT create any procedure TO c##erpuser;
+GRANT create sequence TO c##erpuser;
+GRANT create synonym TO c##erpuser;
+GRANT ALL PRIVILEGES TO c##erpuser;
+
+GRANT CONNECT TO c##erpuser;
+GRANT RESOURCE TO c##erpuser;
+GRANT DBA TO c##erpuser;
+-- ------------------------------------------------------------------------------------	
+-- 3. Connect to user c##erpuser
+-- ------------------------------------------------------------------------------------
+             connect c##erpuser/root
+-- ------------------------------------------------------------------------------------
+-- 4. Create tables in it
+<COL_NAME>  <DATA_TYPE> CONSTRAINT <NAME_OF_CONSTRAINT_OBJECT> PRIMARY KEY
+BRANCHNO	INT 		CONSTRAINT PK_BRANCH_BRANCHNO 		   PRIMARY KEY,
+
+PK_BRANCH_BRANCHNO
+pk=>PRIMARY KEY
+BRANCH=>TABLE IN WHICH YOU ARE CREATING
+BRANCHno=>ON WHICH COLUMN ITS CREATED
+
+Table may have columns which are unique and not null
+These columns are called candidate keys
+When you select one column as primary key from the candidate keys, 
+non selected columns become alternate keys.
+
+@@DEPTNO 		NUMBER(2) CONSTRAINT FK_EMP_DEPTNO REFERENCES DEPT,	
+
+FK_EMP_DEPTNO
+FK=>FOREIGN KEY
+EMP=>WHERE IT IS CREATED
+DEPTNO=>ON WHICH COLUMN
+-- ------------------------------------------------------------------------------------
+
+CREATE TABLE BRANCH 
+(
+	BRANCHNO	INT CONSTRAINT PK_BRANCH_BRANCHNO PRIMARY KEY,
+	BRANCHNAME  VARCHAR2(20) NOT NULL,
+	LOCATION    VARCHAR2(20) NOT NULL 
+);
+	
+CREATE TABLE DEPT    
+(
+	DEPTNO 		NUMBER(2) CONSTRAINT PK_DEPT PRIMARY KEY,
+	DNAME 		VARCHAR2(14) NOT NULL UNIQUE;
+	BRANCHNO	INT CONSTRAINT FK_DEPT_BRANCHNO REFERENCES BRANCH
+) ;
+
+
+CREATE TABLE EMP
+(
+	EMPNO 		NUMBER(4) CONSTRAINT PK_EMP PRIMARY KEY,
+	ENAME 		VARCHAR2(10),
+	JOB 		VARCHAR2(9),
+	MGR 		NUMBER(4),
+	HIREDATE 	DATE,
+	SAL 		NUMBER(7,2),
+	COMM 		NUMBER(7,2),
+	DEPTNO 		NUMBER(2) CONSTRAINT FK_EMP_DEPTNO REFERENCES DEPT,
+	BRANCHNO 	INT CONSTRAINT FK_EMP_BRANCHNO REFERENCES BRANCH
+);   
+    	
+-- ------------------------------------------------------------------------------------
+-- 5. Insert data into DML  
+-- ------------------------------------------------------------------------------------
+	INSERT INTO BRANCH VALUES 	(101,'Geneva','NEW YORK');
+	INSERT INTO BRANCH VALUES 	(102,'Geneva','NEW YORK');
+	INSERT INTO BRANCH VALUES 	(103,'CHICAGO','CHICAGO');
+	INSERT INTO BRANCH VALUES 	(104,'CHICAGO','CHICAGO');
+	INSERT INTO BRANCH VALUES 	(105,'Kingston','NEW YORK');
+	INSERT INTO BRANCH VALUES 	(106,'Kingston','NEW YORK');
+
+-- ------------------------------------------------------------------------------------
+	INSERT INTO DEPT VALUES	(10,'ACCOUNTING',101);
+	INSERT INTO DEPT VALUES (20,'RESEARCH',103);
+	INSERT INTO DEPT VALUES	(30,'SALES',105);
+	INSERT INTO DEPT VALUES	(40,'OPERATIONS',106);
+-- ------------------------------------------------------------------------------------
+DATE => ORACLE: to_date('17-12-1980','dd-mm-yyyy') 
+THE STRING ENTERED HAS A PATTERN DD-MM-YYYY => ORACLE DATE -> DATE -> MONTH-> YEAR->
+to_date('13-JUL-87')-51 IT WILL DEDUCT 51 DAYS FROM GIVE DATE
+-- ------------------------------------------------------------------------------------
+
+
+INSERT INTO EMP VALUES(7369,'SMITH','CLERK',7902,to_date('17-12-1980','dd-mm-yyyy'),800,NULL,20,102);
+INSERT INTO EMP VALUES(7499,'ALLEN','SALESMAN',7698,to_date('20-2-1981','dd-mm-yyyy'),1600,300,30,102);
+INSERT INTO EMP VALUES(7521,'WARD','SALESMAN',7698,to_date('22-2-1981','dd-mm-yyyy'),1250,500,30,103);
+INSERT INTO EMP VALUES(7566,'JONES','MANAGER',7839,to_date('2-4-1981','dd-mm-yyyy'),2975,NULL,20,104);
+INSERT INTO EMP VALUES(7654,'MARTIN','SALESMAN',7698,to_date('28-9-1981','dd-mm-yyyy'),1250,1400,30,105);
+INSERT INTO EMP VALUES(7698,'BLAKE','MANAGER',7839,to_date('1-5-1981','dd-mm-yyyy'),2850,NULL,30,105);
+INSERT INTO EMP VALUES(7782,'CLARK','MANAGER',7839,to_date('9-6-1981','dd-mm-yyyy'),2450,NULL,10,102);
+INSERT INTO EMP VALUES(7788,'SCOTT','ANALYST',7566,to_date('13-JU L-87')-85,3000,NULL,20,103);
+INSERT INTO EMP VALUES(7839,'KING','PRESIDENT',NULL,to_date('17-11-1981','dd-mm-yyyy'),5000,NULL,NULL,101);
+INSERT INTO EMP VALUES(7844,'TURNER','SALESMAN',7698,to_date('8-9-1981','dd-mm-yyyy'),1500,0,30,104);
+INSERT INTO EMP VALUES(7876,'ADAMS','CLERK',7788,to_date('13-JUL-87')-51,1100,NULL,20,105);
+INSERT INTO EMP VALUES(7900,'JAMES','CLERK',7698,to_date('3-12-1981','dd-mm-yyyy'),950,NULL,30,103);
+INSERT INTO EMP VALUES(7902,'FORD','ANALYST',7566,to_date('3-12-1981','dd-mm-yyyy'),3000,NULL,20,105);
+INSERT INTO EMP VALUES(7934,'MILLER','CLERK',7782,to_date('23-1-1982','dd-mm-yyyy'),1300,NULL,10,104);
+INSERT INTO EMP VALUES(7901,'JOHN_SMITH','CLERK',7698,to_date('23-1-1982','dd-mm-yyyy'),3000,NULL,30,104);
+
+
+-- ------------------------------------------------------------------------------------
+COMMIT;
+-- ------------------------------------------------------------------------------------
+
+-- ------------------------------------------------------------------------------------
+-- 8. Display all records from dept	
+-- ------------------------------------------------------------------------------------
+    SELECT  * FROM dept;
+    SELECT deptno,dname,branchno FROM dept;
+
+-- ------------------------------------------------------------------------------------
+-- 9. Display all records from branch
+-- ------------------------------------------------------------------------------------
+	SELECT * FROM branch;
+    SELECT branchno, branchname,location FROM branch;
+
+-- ------------------------------------------------------------------------------------
+-- 10. Display all records from emp
+-- ------------------------------------------------------------------------------------
+	SELECT * FROM emp;
+    SELECT empno,ename,job,mgr,hiredate,sal,comm,deptno,branchno  FROM emp;
+	
+-- ------------------------------------------------------------------------------------
+-- 11. Sort recrods using order by clause
+-- ------------------------------------------------------------------------------------
+-- 11.1 Sort the all employees details on empno
+-- ------------------------------------------------------------------------------------
+	SELECT 
+		empno,ename,job,mgr,hiredate,sal,comm,deptno,branchno  
+	FROM
+	emp
+	ORDER BY 
+	empno;
+-- ------------------------------------------------------------------------------------
+-- 11.2 Sort the all employees details on department wise
+-- ------------------------------------------------------------------------------------
+	SELECT 
+		empno,ename,job,mgr,hiredate,sal,comm,deptno,branchno  
+	FROM
+		emp
+	ORDER BY
+		deptno;
+-- ------------------------------------------------------------------------------------
+-- 11.3 Sort the all employees details as per department by emp no
+--empno,ename,job,mgr,hiredate,sal,comm,deptno,branchno  
+-- ------------------------------------------------------------------------------------
+	SELECT 
+		deptno,empno,ename,job,mgr,hiredate,sal,comm,branchno    
+	FROM
+		emp
+	ORDER BY
+		deptno,empno;    
+======================================================================================================
+#### 01-Feb-2022
+Agenda:  
+1. DQL 
+	SELECT , FROM, WHERE, ORDER BY
+	OPERATORS
+=======================================================================================================
+-- ------------------------------------------------------------------------------------
+-- 11.4 Sort the all employees details as per department in ascending by emp no descending
+-- ------------------------------------------------------------------------------------
+SELECT 
+    deptno,empno,ename,job,mgr,hiredate,sal,comm,branchno    
+FROM
+    emp
+ORDER BY
+    deptno,empno DESC;
+-- ------------------------------------------------------------------------------------
+-- 11.5 Sort the all employees details as per department no, salary
+-- ------------------------------------------------------------------------------------
+SELECT
+    deptno,empno,ename,job,mgr,hiredate,sal,comm,branchno
+FROM 
+    emp
+ORDER BY
+    deptno,sal;
+-- ------------------------------------------------------------------------------------
+-- 11.6 Sort the all employees details as per salary
+-- ------------------------------------------------------------------------------------
+SELECT 
+    deptno,empno,ename,job,mgr,hiredate,sal,comm,branchno
+FROM 
+    emp
+ORDER BY
+    sal;
+-- ------------------------------------------------------------------------------------
+-- 12. WHERE CLAUSE
+-- Where caluse with in,not in, is null, is not null, between, not between
+-- Where caluse with Comparison Operator (<,>,<=,>=,=,<>,!=)
+-- Where caluse with Logical Operator (AND,OR,NOT) 
+-- ------------------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------------
+-- 12.1 Display all emp working in deptno 10
+-- ------------------------------------------------------------------------------------
+SELECT 
+    empno,ename,job,mgr,hiredate,sal,comm,deptno,branchno
+FROM
+    emp
+WHERE deptno=10;
+-- ------------------------------------------------------------------------------------
+-- 12.2 Display employee no,name working department no 10
+-- ------------------------------------------------------------------------------------
+SELECT 
+    empno,ename,deptno
+FROM
+    emp
+WHERE deptno=10;
+-- ------------------------------------------------------------------------------------
+-- 12.3 Display all employees working in department no 10 or 20
+-- using OR
+-- using IN
+-- ------------------------------------------------------------------------------------
+SELECT 
+    empno,ename,deptno
+FROM
+    emp
+WHERE 
+    deptno=10 or deptno=20;
+--
+SELECT 
+    empno,ename,deptno
+FROM
+    emp
+WHERE 
+    deptno IN (10,20);
+
+-- ------------------------------------------------------------------------------------
+-- 12.4 Display all employees not working in 10,20,30
+-- ------------------------------------------------------------------------------------
+SELECT
+    empno,ename,deptno
+FROM
+    emp
+WHERE
+    deptno not in (10,20,30);
+-- ------------------------------------------------------------------------------------
+-- 12.4 Display all employees not working in any department i.e. deptno is null
+-- ------------------------------------------------------------------------------------
+
+SELECT
+    empno,ename,deptno
+FROM
+    emp
+WHERE
+    deptno is null;
+-- ------------------------------------------------------------------------------------
+-- 12.4 Display all employees who is working in some department i.e. deptno not null
+-- ------------------------------------------------------------------------------------
+
+SELECT
+    empno,ename,deptno
+FROM
+    emp
+WHERE
+    deptno is not null;
+    -- Below query retuns zero records as we can't compare null with values
+SELECT 
+    empno,ename,comm
+FROM 
+    emp
+WHERE 
+    deptno=30 and comm not in (null,0);-- comm!=null or comm!=0
+
+-- ------------------------------------------------------------------------------------
+-- 12.8 Display all employees not earning any commission
+-- ------------------------------------------------------------------------------------
+SELECT
+    empno,ename,comm
+FROM
+    emp
+WHERE 
+    comm is null or comm = 0;
+
+-- ------------------------------------------------------------------------------------
+-- 12.9 Display all employees earning salary in range 1000 to 3000 including boundry values
+-- ------------------------------------------------------------------------------------
+
+SELECT
+    empno,ename,sal
+FROM
+    emp
+WHERE
+    sal>=1000 and sal<=3000
+ORDER BY
+    sal;
+    
+    
+
+SELECT
+    empno,ename,sal
+FROM
+    emp
+WHERE
+    sal BETWEEN 1000 AND 3000
+ORDER BY
+    sal;
+
+
+
+-- ------------------------------------------------------------------------------------
+-- 12.10 Display all employees earning salary in range 1000 to 3000 excluding boundry values
+-- ------------------------------------------------------------------------------------
+SELECT
+    empno,ename,sal
+FROM
+    emp
+WHERE
+    sal>1000 and sal<3000
+ORDER BY
+    sal;
+
+SELECT
+    empno,ename,sal
+FROM
+    emp
+WHERE
+    sal BETWEEN 1001 AND 2999
+ORDER BY
+    sal;
+
+SELECT
+    empno,ename,sal
+FROM
+    emp
+WHERE
+    sal BETWEEN (1000+1) AND (3000-1)
+ORDER BY
+    sal;
+
+
+-- ------------------------------------------------------------------------------------
+-- 12.11 Display all employees earning salary not in range 1000 to 3000
+-- ------------------------------------------------------------------------------------
+SELECT
+    empno,ename,sal
+FROM
+        emp
+WHERE
+    sal not between 1000 and 3000
+ORDER BY
+    sal;
+
+
+-- ------------------------------------------------------------------------------------
+-- 12.12 Display all employees earning 5000salary 
+-- ------------------------------------------------------------------------------------
+SELECT
+    empno,ename,sal
+FROM
+    emp
+WHERE
+    sal=5000
+ORDER BY 
+    sal;
+
+
+	
+
+-- ------------------------------------------------------------------------------------
+-- 13. Where caluse with like
+--     WHERE WITH ESCAPE Clause
+--   = comparison ->equality-> exact match
+-- ------------------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------------
+-- 13.1 Display all details of SMITH
+-- ------------------------------------------------------------------------------------
+SELECT
+    empno,ename
+FROM
+    emp
+WHERE
+    ename='SMITH'
+ORDER BY
+    ename;
+--    below query won't return any record as data saved in a cell is Case Sensetive
+SELECT
+    empno,ename
+FROM
+    emp
+WHERE
+    ename='Smith'
+ORDER BY
+    ename;    
+
+-- ------------------------------------------------------------------------------------
+-- 13.2 Display all details of EMPLOYEE who's name starts with S
+-- ------------------------------------------------------------------------------------
+SELECT
+    empno,ename
+FROM
+    emp
+WHERE
+    ename LIKE 'S%'
+ORDER BY
+    ename;    
+
+-- ------------------------------------------------------------------------------------
+-- 13.3 Display all details of EMPLOYEE who's name ends with S
+-- ------------------------------------------------------------------------------------
+SELECT
+    empno,ename
+FROM
+    emp
+WHERE
+    ename LIKE '%S'
+ORDER BY
+    ename;    
+
+-- ------------------------------------------------------------------------------------
+-- 13.4 Display all details of EMPLOYEE who's name contains LL
+-- ------------------------------------------------------------------------------------
+SELECT
+    empno,ename
+FROM
+    emp
+WHERE
+    ename LIKE '%LL%'
+ORDER BY
+    ename;    
+
+
+-- ------------------------------------------------------------------------------------
+-- 13.5 Display all details of EMPLOYEE who's name contains _
+-- ------------------------------------------------------------------------------------
+SELECT
+    empno,ename
+FROM
+    emp
+WHERE
+    ename LIKE '%\_%' ESCAPE '\' 
+ORDER BY
+    ename;    
+
+-- ------------------------------------------------------------------------------------
+-- 14. Aggregate Function max,min,sum,avg,count 
+--     SUM
+--     AVG
+--     COUNT
+--     MAX
+--     MIN
+-- ------------------------------------------------------------------------------------
+-- 14.1 Display count of employees
+-- count(*) including null values 
+-- ------------------------------------------------------------------------------------
+SELECT
+    COUNT(*)
+FROM 
+    emp;
+-- ------------------------------------------------------------------------------------
+-- 14.2 Display count of employees WORKING IN SOME DEPT
+-- count(deptno) excludes the null vlaue 
+-- ------------------------------------------------------------------------------------
+SELECT
+    COUNT(*),COUNT(deptno),COUNT(EMPNO)
+FROM
+    emp;
+-- ------------------------------------------------------------------------------------
+-- 14.3 Display max,min,sum,avg salary of employees
+-- ------------------------------------------------------------------------------------
+SELECT
+    MIN(sal),MAX(sal),SUM(sal),AVG(sal),COUNT(sal)
+FROM 
+    emp;
+
+
+-- ------------------------------------------------------------------------------------
+-- 15. Aggregate Function max,min,sum,avg,count  and grouping
+-- ------------------------------------------------------------------------------------
+-- 15.1 Display department wise count of employees
+-- ------------------------------------------------------------------------------------
+SELECT
+        deptno,count(empno)
+FROM
+        emp
+GROUP BY 
+        deptno
+ORDER BY 
+        deptno;
+
+-- 15.1 Display  job wise count of employees                
+SELECT
+        job,count(empno)
+FROM
+        emp
+GROUP BY 
+        job
+ORDER BY 
+        count(empno);
+       
+	-- ------------------------------------------------------------------------------------
+-- 15.2 Display department wise max,min,avg salary
+-- ------------------------------------------------------------------------------------
+SELECT
+    deptno,min(sal),max(sal),avg(sal),sum(sal)
+FROM
+    emp
+GROUP BY
+        deptno
+ORDER BY 
+        deptno;
+ 
+
+-- ------------------------------------------------------------------------------------
+-- 15.2 Display department wise max,min,avg salary
+-- ------------------------------------------------------------------------------------
+SELECT
+    deptno,min(sal),max(sal),avg(sal),sum(sal)
+FROM
+    emp
+GROUP BY
+        deptno
+ORDER BY 
+        deptno;
+
+
+SELECT
+    deptno,min(sal),max(sal),round(avg(sal),2),sum(sal)
+FROM
+    emp
+GROUP BY
+        deptno
+HAVING 
+        deptno=30
+ORDER BY 
+        deptno;
+-- ------------------------------------------------------------------------------------
+-- 15.3 Display department wise max,min,avg salary where avg(sal)<2500
+-- ------------------------------------------------------------------------------------
+SELECT 
+    deptno,min(sal),max(sal),avg(sal),sum(sal)
+FROM
+        emp
+GROUP BY
+        deptno
+HAVING 
+        avg(sal)<2500
+ORDER BY
+        deptno;
+
+-- ------------------------------------------------------------------------------------
+-- 16. Special functions nvl() 
+-- If comm is null display 0
+-- ------------------------------------------------------------------------------------
+SELECT
+    empno,ename,sal,comm, sal+comm
+FROM 
+    emp
+ORDER BY
+    empno;
+
+-- correct solution
+SELECT
+    empno,ename,sal,comm, sal+nvl(comm,0)
+FROM 
+    emp
+ORDER BY
+    comm;
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+1. OracleTutorial reading + queries execution ->git
+2. Assignment 30+ -> git 
+
+
+#### 02-Feb-22
+Agenda: 
+1. Oracle Fuctions: string,date,math
+2. subqueries
+3. Distinct
+######################################################
+-- Doubt on primary key, auto generation of primary key
+create table temp1(
+id int primary key,
+data varchar2(34)
+);
+
+insert into temp1 values(1,'some data');
+insert into temp1 values(2,'some data');
+insert into temp1 values(3,'some data');
+insert into temp1 values(4,'some data');
+
+select * from temp1;
+
+delete from temp1 where id=4;
+--ORA-00001: unique constraint (C##ERPUSER.SYS_C008348) violated
+
+DROP TABLE temp1;
+
+create table temp1(
+id int GENERATED BY DEFAULT AS IDENTITY START WITH 10 PRIMARY KEY,
+data varchar2(34)
+);
+
+insert into temp1(data) values('some data');
+insert into temp1(data) values('some data');
+insert into temp1(data) values('some data');
+insert into temp1 (data)values('some data');
+
+select * from temp1;
+
+create table temp2(
+id int GENERATED BY DEFAULT AS IDENTITY START WITH 10 PRIMARY KEY,
+data varchar2(34)
+);
+
+------------------------------------------------------------------------------------####
+-- ------------------------------------------------------------------------------------
+-- Text Literal Example 
+-- The text literal '10' has datatype CHAR. 
+-- Oracle implicitly converts it to the NUMBER datatype if it appears in a numeric 
+-- expression as in the following statement:
+-- ------------------------------------------------------------------------------------
+-- 17. Display employees salary +10
+-- ------------------------------------------------------------------------------------
+SELECT
+    empno,ename,sal,sal+10, sal+'10'
+FROM 
+    emp;
+
+
+-- ------------------------------------------------------------------------------------
+-- Date Example
+-- In the following statement, Oracle implicitly converts '03-Dec-81' 
+-- to a DATE value using the default date format 'DD-MON-YY':
+-- ------------------------------------------------------------------------------------
+-- 18, Display details of employees join on 3rd Dec'1981
+-- ------------------------------------------------------------------------------------
+	SELECT 
+		empno,ename,hiredate
+	FROM 
+		emp
+	WHERE
+		hiredate='03-Dec-81';
+-- Second way
+SELECT 
+    empno,ename,hiredate
+FROM 
+    emp
+WHERE
+    hiredate=to_date('03-12-1981','dd-mm-yyyy');
+    
+
+-- ------------------------------------------------------------------------------------
+-- to_char(datetime)
+--  converts a datetime or interval value of DATE, TIMESTAMP, TIMESTAMP WITH TIME ZONE, 
+--  or TIMESTAMP WITH LOCAL TIME ZONE datatype to a value of VARCHAR2 datatype in the 
+--  format specified by the date format fmt.
+-- ------------------------------------------------------------------------------------
+CREATE TABLE date_tab (
+   ts_col      TIMESTAMP,
+   tsltz_col   TIMESTAMP WITH LOCAL TIME ZONE,
+   tstz_col    TIMESTAMP WITH TIME ZONE);
+
+-- ------------------------------------------------------------------------------------
+-- The example shows the results of applying TO_CHAR to different TIMESTAMP datatypes.
+--  The result for a TIMESTAMP WITH LOCAL TIME ZONE column is sensitive to session time zone, 
+-- whereas the results for the TIMESTAMP and TIMESTAMP WITH TIME ZONE columns are not sensitive 
+-- to session time zone:
+-- ------------------------------------------------------------------------------------
+ALTER SESSION SET TIME_ZONE = '-8:00';
+INSERT INTO date_tab VALUES (  
+   TIMESTAMP'1999-12-01 10:00:00',
+   TIMESTAMP'1999-12-01 10:00:00',
+   TIMESTAMP'1999-12-01 10:00:00');
+INSERT INTO date_tab VALUES (
+   TIMESTAMP'1999-12-02 10:00:00 -8:00', 
+   TIMESTAMP'1999-12-02 10:00:00 -8:00',
+   TIMESTAMP'1999-12-02 10:00:00 -8:00');
+-- ------------------------------------------------------------------------------------
+ALTER SESSION SET TIME_ZONE = '+5:30';
+INSERT INTO date_tab VALUES (  
+   TIMESTAMP'1999-12-01 10:00:00',
+   TIMESTAMP'1999-12-01 10:00:00',
+   TIMESTAMP'1999-12-01 10:00:00');
+INSERT INTO date_tab VALUES (
+   TIMESTAMP'1999-12-02 10:00:00 +5:30', 
+   TIMESTAMP'1999-12-02 10:00:00 +5:30',
+   TIMESTAMP'1999-12-02 10:00:00 +5:30');
+-- ------------------------------------------------------------------------------------
+-- record        02-DEC-99 10.00.00.000000000 AM +05:30   
+-- query output: 02-DEC-1999 10:00:00.000000 +05:30
+-- ------------------------------------------------------------------------------------
+SELECT TO_CHAR(ts_col, 'DD-MON-YYYY HH24:MI:SSxFF'),
+   TO_CHAR(tstz_col, 'DD-MON-YYYY HH24:MI:SSxFF TZH:TZM')
+   FROM date_tab;
+   -- ------------------------------------------------------------------------------------   
+SELECT SESSIONTIMEZONE,    TO_CHAR(tsltz_col, 'DD-MON-YYYY HH24:MI:SSxFF')
+   FROM date_tab;
+   
+ALTER SESSION SET TIME_ZONE = '-5:00';
+SELECT TO_CHAR(ts_col, 'DD-MON-YYYY HH24:MI:SSxFF'),    TO_CHAR(tstz_col, 'DD-MON-YYYY HH24:MI:SSxFF TZH:TZM')
+   FROM date_tab;
+   
+SELECT SESSIONTIMEZONE,    TO_CHAR(tsltz_col, 'DD-MON-YYYY HH24:MI:SSxFF')     FROM date_tab;
+
+-- ------------------------------------------------------------------------------------   
+--0+1=1
+--1+1=0 cary 1
+-- ------------------------------------------------------------------------------------   
+SELECT TO_CHAR('01110' + 1) FROM dual;   
+-- ------------------------------------------------------------------------------------   
+
+SELECT TO_CHAR(-10000,'L99G999D99MI') "Amount"     FROM DUAL;
+-- ------------------------------------------------------------------------------------
+-- UNLOCK ACCOUNT
+-- ------------------------------------------------------------------------------------
+ALTER USER OE IDENTIFIED BY ROOT ACCOUNT UNLOCK;
+CONNECT OE/ROOT
+SELECT USER, UID FROM DUAL;
+
+
+-- ------------------------------------------------------------------------------------
+10	ACCOUNTING
+40	OPERATIONS
+20	RESEARCH
+30	SALES
+-- Decode the department no in employee table as above
+-- ------------------------------------------------------------------------------------
+SELECT 
+    empno,ename,deptno,
+    DECODE(deptno,
+            10,	'ACCOUNTING',
+            40,	'OPERATIONS',
+            20,	'RESEARCH',
+            30,	'SALES',
+            'No Specific Department')
+    FROM 
+        emp;
+
+
+-- ------------------------------------------------------------------------------------
+-- 						CASE statement
+-- CASE statement has the functionality of an IF-THEN-ELSE statement	
+-- The CASE statement returns any datatype such as a string, numeric, date, etc. 
+-- (BUT all results must be the same datatype in the CASE statement.)
+-- If all conditions are not the same datatype, an ORA-00932 error will be returned.
+-- If all results are not the same datatype, an ORA-00932 error will be returned.
+-- If no condition is found to be true, then the CASE statement will return the value in the ELSE clause.
+-- If the ELSE clause is omitted and no condition is found to be true, then the CASE statement will return NULL.   
+-- ------------------------------------------------------------------------------------	   
+SELECT 
+    empno,ename,sal,comm
+FROM
+    emp
+WHERE ename!='KING'
+ORDER BY COMM;
+-- IF COMM = O -> RETURN 500
+-- IF COMM IS NULL -> RETURN 0
+-- IF COMM IS >0 AND <500 -> RETURN COMM+500
+-- IF COMM >500 -> COMM
+
+SELECT 
+    empno,ename,sal,comm,CASE
+                        WHEN comm=0 then 500
+                        WHEN comm is null then 0
+                        WHEN comm>0 and comm<500 then comm+500
+                        ELSE comm
+                    END as updated_comm
+FROM 
+    emp
+WHERE 
+    ename!='KING'
+ORDER BY
+    comm;
+-- ------------------------------------------------------------------------------------	   
+-- COALESCE returns the first non-null expr in the expression list. 
+-- At least one expr must not be the literal NULL. 
+-- If all occurrences of expr evaluate to null, then the function returns null.
+-- ------------------------------------------------------------------------------------	   
+--SELECT comm, COALESCE(500,0,comm+500,comm) 
+--FROM emp
+--ORDER by comm;
+--1. Resultant column -> more than one columns in a table
+-- in collace if the expression is not null then it returns
+SELECT sal,comm,COALESCE(comm,sal,300)
+FROM 
+    emp
+order by comm;
+
+
+SELECT sal,comm,sal+comm,COALESCE(sal+comm,comm,sal)
+FROM 
+    emp
+order by comm;
+
+
+
+-- ------------------------------------------------------------------------------------	   
+-- The following example calculates the rank of a hypothetical employee in the sample table 
+-- hr.employees with a salary of $15,500 and a commission of 5%:   
+-- ------------------------------------------------------------------------------------	   
+SELECT RANK(15500, .05) WITHIN GROUP (ORDER BY salary, commission_pct) "Rank" FROM employees;
+
+SELECT SAL,COMM FROM EMP ORDER BY SAL,COMM;
+-- RANK THE EMPLOYEE WHOS SALARY 5000 
+SELECT SAL FROM EMP ORDER BY SAL;
+SELECT 
+    RANK(5000) WITHIN GROUP (ORDER BY SAL)AS "RANK Asc",
+    RANK(5000) WITHIN GROUP (ORDER BY SAL DESC)AS "RANK desc"
+    FROM EMP; 
+
+SELECT 
+    RANK(3000) WITHIN GROUP (ORDER BY SAL)AS "RANK Asc",
+    RANK(3000) WITHIN GROUP (ORDER BY SAL DESC)AS "RANK desc"
+    FROM EMP; 
+
+--SELECT 
+--    SAL,
+--    RANK(3000) WITHIN GROUP (ORDER BY SAL)AS "RANK Asc"
+--FROM 
+--    EMP 
+--WHERE SAL=3000
+--    GROUP BY SAL
+--    ORDER BY SAL;
+
+
+SELECT SAL FROM EMP ORDER BY SAL;
+
+SELECT deptno,sal, RANK() OVER (PARTITION BY deptno ORDER BY sal) as "RankPER DEPT" FROM emp;
+
+SELECT deptno,sal,
+RANK() OVER (PARTITION BY deptno ORDER BY sal) as "RankPER DEPT",
+RANK()OVER ( ORDER BY sal) as "Rank PER SAL "
+FROM emp
+ORDER BY DEPTNO,SAL;
+
+SELECT deptno,sal,
+RANK()OVER ( ORDER BY sal) as "Rank PER SAL "
+FROM emp
+ORDER BY SAL;
+
+
+
+====================================================
+
+====================================================
+
+-- ------------------------------------------------------------------------------------	 
+-- DENSE_RANK computes the rank of a row in an ordered group of rows and returns the rank as a NUMBER. 
+-- ------------------------------------------------------------------------------------	 
+
+SELECT 
+    DENSE_RANK(5000) 
+    WITHIN GROUP  (ORDER BY sal DESC) "Dense Rank sal desc",
+    DENSE_RANK(5000)     WITHIN GROUP  (ORDER BY sal asc) "Dense Rank sal asc"
+    FROM emp;
+-- ------------------------------------------------------------------------------------	 
+-- The following statement selects the department name, employee name, and salary of all employees
+-- who work in the human resources or purchasing department, and then computes a rank for each unique 
+-- salary in each of the two departments.
+-- dense_rank without partition Over() gives error
+-- ------------------------------------------------------------------------------------	 
+SELECT * FROM dept;
+-- DISPLAY employees working in  Research -20 and Sales -30
+SELECT
+    empno,ename,deptno,sal,DENSE_RANK() OVER ( PARTITION  BY deptno ORDER BY sal desc),
+FROM 
+    emp
+WHERE
+    deptno IN (SELECT deptno FROM dept WHERE dname IN ('RESEARCH','SALES'))
+ORDER BY deptno,sal desc;
+
+-- ------------------------------------------------------------------------------------	 	
+-- The following example returns, within each department of the sample table hr.employees, 
+-- the minimum salary among the employees who make the lowest commission and the maximum 
+-- salary among the employees who make the highest commission:
+--MIN(salary) KEEP (DENSE_RANK FIRST ORDER BY commission_pct) "Worst",
+--MAX(salary) KEEP (DENSE_RANK LAST ORDER BY commission_pct) "Best"
+
+-- ------------------------------------------------------------------------------------	 
+SELECT deptno,
+MIN(sal) KEEP (DENSE_RANK FIRST ORDER BY comm) "Worst",
+MAX(sal) KEEP (DENSE_RANK LAST ORDER BY comm) "Best"
+   FROM emp
+   GROUP BY deptno;
+
+-- ------------------------------------------------------------------------------------	 	
+-- For each department in the sample table oe.employees, the following example assigns 
+-- numbers to each row in order of employee's hire date:
+-- ------------------------------------------------------------------------------------	 	   
+--SELECT department_id, last_name, employee_id, ROW_NUMBER() OVER 
+--(PARTITION BY department_id ORDER BY employee_id) AS emp_id
+-- FROM employees;   
+
+SELECT 
+    DEPTNO, EMPNO,ENAME, ROW_NUMBER() OVER (PARTITION BY DEPTNO ORDER BY EMPNO) AS EMPID
+FROM 
+    EMP;
+-- ------------------------------------------------------------------------------------	  
+--List all employees join in dec 81 and working for dept 10 as manager as 
+--per the highest to lowest salary
+-- ------------------------------------------------------------------------------------	 
+--select * from emp where hiredate like '%-12-81' order by sal desc;
+
+--order by sal desc;
+  
+SELECT 
+    EMPNO,ENAME,JOB,HIREDATE,DEPTNO
+FROM 
+    EMP
+WHERE 
+    HIREDATE LIKE '%-DEC-81' 
+    AND JOB='CLERK'
+ORDER BY
+    SAL;
+--select * from emp where to_char(hiredate,'yy')=81 and to_char(hiredate,'mm')=12 and deptno=10 and job='manager'    
+    
+SELECT 
+    EMPNO,ENAME,JOB,HIREDATE,DEPTNO
+FROM 
+    EMP
+WHERE 
+    TO_CHAR(HIREDATE,'YY')=81  AND  TO_CHAR(HIREDATE,'MM')= 12 AND JOB='CLERK'
+ORDER BY
+    SAL;
+-- ------------------------------------------------------------------------------------	 		
+-- Module 4 Displaying Data from Multiple Tables
+--   A. SUBQUERY ->
+--            1. PROJECTION TAKES ALL COLUMN FROM ONE TABLE WE USE SUBQUERY
+--            2. QUERY WITHIN QUERY NESTED QUERIES 
+--            3. INNER QUERY AND OUTER QUERY WHERE OUTER QUERY DEPENDS ON RESULTS OF INNER QUERY
+--            4. INNER QUERY IS EXECUED FIRST THEN THE OUTER QUERY
+--            5. = it indicates we are matching exactly one record from the inner query
+--            6. IN it indicates we are matching values with list of records given by inner query
+--   B. JOIN->PROJECTION TAKES COLUMNS FROM MORE THAN ONE TABLE WE USE JOINS
+-- ------------------------------------------------------------------------------------	 	
+-- List all emp who are working in same dept of martin
+-- To solve above requirement we are using inner query or subquery
+-- ------------------------------------------------------------------------------------	 	
+-- 1. GET DEPTNO FOR MARTIN
+SELECT DEPTNO FROM EMP WHERE ENAME='MARTIN';
+-- 2. ALL EMPLOYEES WORKING WITH MARTIN 
+SELECT EMPNO,ENAME,DEPTNO FROM EMP WHERE DEPTNO=30;
+-- 3. FINAL 
+SELECT EMPNO,ENAME,DEPTNO FROM EMP WHERE DEPTNO=(SELECT DEPTNO FROM EMP WHERE ENAME='MARTIN');
+-- ------------------------------------------------------------------------------------	 
+-- List detail of Max earning employee
+-- ------------------------------------------------------------------------------------	  
+-- 1. get max(sal)
+SELECT MAX(SAL) FROM EMP;
+-- 2. get employees who has max sal
+SELECT EMPNO,ENAME,DEPTNO,JOB,MGR,HIREDATE,SAL,COMM FROM EMP
+WHERE SAL=5000
+--
+3. 
+SELECT EMPNO,ENAME,DEPTNO,JOB,MGR,HIREDATE,SAL,COMM FROM EMP
+WHERE SAL=(SELECT MAX(SAL) FROM EMP);
+-- ------------------------------------------------------------------------------------	 
+-- List all emp who have joined in same month and year with martin and working in turner department
+-- ------------------------------------------------------------------------------------	 
+--1.working in turner department->GET DEPTNO OF TURNER
+   SELECT DEPTNO FROM EMP WHERE ENAME='TURNER' 
+--2.HIRE DATE OF MARTIN
+   SELECT HIREDATE FROM EMP WHERE ename='MARTIN';
+--3.who have joined in same month with martin
+   SELECT ENAME,HIREDATE FROM EMP 
+   WHERE TO_CHAR(HIREDATE,'MM')=TO_CHAR((SELECT HIREDATE FROM EMP WHERE ENAME='MARTIN'),'MM')
+--4.who have joined in same  year with martin
+SELECT ENAME,HIREDATE FROM EMP 
+   WHERE TO_CHAR(HIREDATE,'YY')=TO_CHAR((SELECT HIREDATE FROM EMP WHERE ENAME='MARTIN'),'YY')
+--5. fINAL   List all emp who have joined in same month and year with martin and working in turner department
+
+-- uSING  TO_CHAR(HIREDATE,'MM') AND TO_CHAR(HIREDATE,'YY')
+SELECT ENAME,DEPTNO,HIREDATE FROM EMP 
+WHERE 
+    TO_CHAR(HIREDATE,'MM')=TO_CHAR((SELECT HIREDATE FROM EMP WHERE ENAME='MARTIN'),'MM')   
+    AND
+     TO_CHAR(HIREDATE,'YY')=TO_CHAR((SELECT HIREDATE FROM EMP WHERE ENAME='MARTIN'),'YY')
+    AND
+    DEPTNO=(SELECT DEPTNO FROM EMP WHERE ENAME='TURNER' );
+
+-- OR TO_CHAR(HIREDATE,'MM:YY')
+
+SELECT ENAME,DEPTNO,HIREDATE FROM EMP 
+WHERE 
+TO_CHAR(HIREDATE,'MM:YY')=(SELECT TO_CHAR(HIREDATE,'MM:YY') FROM EMP WHERE ename='MARTIN')
+AND
+deptno=(SELECT DEPTNO FROM EMP WHERE ENAME='TURNER')
+
+
+-- ------------------------------------------------------------------------------------	 
+-- LIST ALL EMPLOYEES WHOES MANAGER IS KING
+-- ------------------------------------------------------------------------------------	 
+-- 1. GET EMPNO OF KING
+    SELECT EMPNO FROM EMP 
+    WHERE
+        ENAME='KING';
+-- 2. COMPARE IT WITH MGR OF OTHER EMPLOYEES
+    SELECT EMPNO,ENAME,MGR FROM EMP
+    WHERE 
+        MGR=7839;
+--3. fINAL LIST ALL EMPLOYEES WHOES MANAGER IS KING
+    SELECT EMPNO,ENAME,MGR FROM EMP
+    WHERE 
+        MGR=(SELECT EMPNO FROM EMP     WHERE        ENAME='KING');
+
+-- ------------------------------------------------------------------------------------	 
+-- LIST ALL EMP WHO ARE WORKING IN RESEARCH DEPARTMENT
+-- ------------------------------------------------------------------------------------	 
+--1. DEPTNO FOR RESEARCH
+    SELECT DEPTNO FROM DEPT WHERE DNAME='RESEARCH';
+--2. DEPTNO == COMMPARED WITH RESEARCH DEPTNO
+    SELECT EMPNO,ENAME,DEPTNO FROM EMP
+    WHERE DEPTNO=20;
+--3. LIST ALL EMP WHO ARE WORKING IN RESEARCH DEPARTMENT    
+SELECT EMPNO,ENAME,DEPTNO FROM EMP
+    WHERE DEPTNO=(SELECT DEPTNO FROM DEPT WHERE DNAME='RESEARCH');
+
+-- ------------------------------------------------------------------------------------	 
+-- LIST TOTAL EMPLOYEE WORKING IN SALES DEPARTMENT
+-- ------------------------------------------------------------------------------------	 
+--    TOTAL=> COUNT
+SELECT COUNT(*) FROM EMP
+-- WORKING IN SALES =>
+SELECT DEPTNO FROM DEPT WHERE dname='SALES';
+-- LIST TOTAL EMPLOYEE WORKING IN SALES DEPARTMENT
+SELECT COUNT(*) FROM EMP
+    WHERE 
+        DEPTNO=(SELECT DEPTNO FROM DEPT WHERE dname='SALES');
+
+        
+-- ------------------------------------------------------------------------------------	 
+-- LIST ALL EMPLOYEE WHO ARE WORKING IN SALES DEPARTMENT IN NEW YORK
+-- ------------------------------------------------------------------------------------	 
+-- BRANCHNO FROM BRANCH TABLE
+    SELECT BRANCHNO FROM BRANCH
+    WHERE LOCATION='NEW YORK';
+-- WORKING IN SALES DEPARTMENT
+    SELECT DEPTNO FROM DEPT
+    WHERE DNAME='SALES';
+    
+SELECT ENAME,DEPTNO FROM EMP
+WHERE DEPTNO=(SELECT DEPTNO FROM DEPT 
+                WHERE DNAME='SALES'
+                AND BRANCHNO IN (SELECT BRANCHNO FROM BRANCH     WHERE LOCATION='NEW YORK')
+              );  
+              
+
+-- ------------------------------------------------------------------------------------
+-- LIST ALL EMP WHO HAVE JOINED IN THE INCEPTION YEAR OF COMPANY
+-- ------------------------------------------------------------------------------------
+SELECT HIREDATE FROM EMP ORDER BY HIREDATE;
+SELECT MIN(HIREDATE) FROM EMP 
+-- SELECT * FROM EMP
+SELECT * FROM EMP
+    WHERE
+        HIREDATE =(SELECT MIN(HIREDATE) FROM EMP) ;
+        
+---- LIST ALL EMP WHO HAVE JOINED IN THE INCEPTION YEAR OF COMPANY        
+SELECT * FROM EMP
+    WHERE
+        TO_CHAR(HIREDATE,'YY') =(SELECT TO_CHAR(MIN(HIREDATE),'YY') FROM EMP) ;
+
+-- ------------------------------------------------------------------------------------
+-- COPY OF A TABLE: COLUMNS AND DATA_TYPES ARE SAME AS ORGINAL TABLE HOWEVER NO CONSTRAINTS ARE APPLIED
+-- CREATE TABLE EMP1 WHICH IS REPLICA OF EMP WITHOUT DATA
+-- ------------------------------------------------------------------------------------
+SELECT * FROM emp WHERE EMPNO=0
+-- CREATE COPY OF EMP TABLE WITHOUT ANY DATA
+    CREATE TABLE 
+                EMP1 
+            AS 
+                SELECT * FROM emp WHERE EMPNO=0
+SELECT * fROM EMP1; 
+-- WE REQUIRED SAMPLE DATA FROM EMPLOYE BASED ON CERTAIN CRITERIA
+-- ------------------------------------------------------------------------------------
+-- INSERT DATA INTO EMP1 FROM EMP WHERE DEPTNO=20
+-- ------------------------------------------------------------------------------------
+INSERT INTO EMP1 (SELECT * FROM EMP WHERE DEPTNO=20)
+SELECT * fROM EMP1; 
+-- ------------------------------------------------------------------------------------
+-- TRUNCATE EMP1 KEEPS THE TABLE STRUCTURE HOWEVER DELETES ALL RECORDS 
+-- ------------------------------------------------------------------------------------
+TRUNCATE TABLE EMP1; 
+DROP TABLE EMP1;
+
+-- ------------------------------------------------------------------------------------
+--  EMP WHERE EMP ARE WORKING IN NEW YORK LOCATION
+-- ------------------------------------------------------------------------------------
+-- LOCATION -> BRANCH-> BRANCHNO
+-- DEPT=>BRANCHNO=>DEPTNO
+-- DEPTNO=> ALL EMPLOYEES WORKING IN THAT DEPT
+
+    SELECT * FROM EMP
+        WHERE 
+            DEPTNO IN (SELECT DEPTNO FROM DEPT 
+                            WHERE BRANCHNO IN (SELECT BRANCHNO FROM BRANCH WHERE LOCATION='NEW YORK'))
+
+--INSERT DATA INTO EMP1 FROM EMP WHERE EMP ARE WORKING IN NEW YORK LOCATION
+    INSERT INTO
+            EMP1
+            (
+            
+    SELECT * FROM EMP
+        WHERE 
+            DEPTNO IN (SELECT DEPTNO FROM DEPT 
+                            WHERE BRANCHNO IN (SELECT BRANCHNO FROM BRANCH WHERE LOCATION='NEW YORK'))
+            )
+-- ------------------------------------------------------------------------------------
+-- UPDATE SALARY BY 10% WHO ARE WORKING IN ACCOUNTING DEPARTMENT 
+-- ------------------------------------------------------------------------------------
+UPDATE  EMP
+    SET 
+        SAL=SAL+SAL*0.1
+    WHERE DEPTNO=(SELECT DEPTNO FROM DEPT WHERE DNAME='ACCOUNTING')
+SELECT * FROM EMP WHERE DEPTNO=(SELECT DEPTNO FROM DEPT WHERE DNAME='ACCOUNTING');
+UPDATE  EMP
+    SET 
+        SAL=SAL-SAL*0.1
+    WHERE DEPTNO=(SELECT DEPTNO FROM DEPT WHERE DNAME='ACCOUNTING')
+rollback ;
+
+-- ------------------------------------------------------------------------------------
+-- DELETE ALL EMP  WHO ARE WORKING IN NEW YORK
+-- ------------------------------------------------------------------------------------
+SELECT * FROM EMP WHERE 
+            DEPTNO IN (SELECT DEPTNO FROM DEPT 
+                            WHERE BRANCHNO IN (SELECT BRANCHNO FROM BRANCH WHERE LOCATION='NEW YORK'))
+DELETE  EMP
+    WHERE 
+            DEPTNO IN (SELECT DEPTNO FROM DEPT 
+                            WHERE BRANCHNO IN (SELECT BRANCHNO FROM BRANCH WHERE LOCATION='NEW YORK'))
+ROLLBACK;
+
+-- CREATE COPY OF EMP TABLE WITH ALL RECRODS FROM EMP
+DROP TABLE EMP1;
+CREATE TABLE EMP1 AS SELECT * FROM emp ;
+SELECT * fROM EMP1; 
+
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+### 07-FEB-22
+Agenda:
+1. Join
+2. view
+------------------------------------------------------------------------------------########################
+SELECT 
+    *
+FROM
+    BRANCH;
+SELECT 
+    *
+FROM
+    dept;
+SELECT
+    *
+FROM
+    EMP;
+    
+--###### inner query #####################################################
+--Get the deptname (dept(dname) for every employee(empno,ename)
+-- emp == deptno == dept
+--###########################################################
+SELECT
+    empno,ename,dname
+FROM    
+    emp JOIN dept ON emp.deptno=dept.deptno;
+
+--###### inner query #####################################################
+--Get the branchname( branch) for every department (deptno,dname)
+-- branch == branchno == dept
+--###########################################################
+SELECT
+    deptno,dname,branchname
+FROM
+    branch JOIN dept ON branch.branchno=dept.branchno;
+--###### outer query #####################################################    
+--Get the deptname (dept(dname) for every employee(empno,ename)
+--including employees not working in any department
+-- emp == deptno == dept
+--###########################################################
+SELECT
+    e.empno,e.ename,d.dname
+FROM
+    emp e LEFT OUTER JOIN dept d
+    ON e.deptno=d.deptno;
+--###### outer query #####################################################    
+--Get the deptname (dept(dname) for every employee(empno,ename)
+--including deptno having no employees
+-- emp == deptno == dept
+--###########################################################
+SELECT
+    e.empno,e.ename,d.dname
+FROM
+    emp e RIGHT OUTER JOIN dept d
+    ON e.deptno=d.deptno;    
+--###### outer query #####################################################    
+--Get the deptname (dept(dname) for every employee(empno,ename)
+--including NULL VALUES for employee in department as well as dept with no employee
+-- emp == deptno == dept
+--###########################################################    
+SELECT
+    e.empno,e.ename,d.dname
+FROM
+    emp e FULL OUTER JOIN dept d
+    ON e.deptno=d.deptno;        
+--###########################################################
+--Get the manager names of every employee
+-- manager name== employee name
+-- emp(mgr)==empno == emp 
+-- emp join emp ==> self join
+--empno,ename managename
+--###########################################################
+SELECT 
+    e.empno,e.ename,m.ename as managername
+FROM
+    emp e JOIN emp m on e.mgr=m.empno
+ORDER BY e.empno;
+
+--###########################################################
+-- its better to use Join and on instead of , where 
+SELECT
+    empno,ename,dname
+FROM    
+     emp,dept WHERE emp.deptno=dept.deptno;
+--    emp JOIN dept ON emp.deptno=dept.deptno;
+
+-- in hypothetical situation if you forgot to write where caluse 
+-- on above query      emp cross join dept ;
+SELECT
+    empno,ename,dname
+FROM    
+     emp,dept ;
+
+SELECT
+    empno,ename,dname
+FROM    
+     emp cross join dept ;
+--###########################################################
+--	d. Display empno,ename,dname,branchname for employee working in deptno=10
+--		EMP   = empno,ename
+--		DEPT  = dname
+--		BRANCH= branchname
+--###########################################################
+SELECT
+    empno,ename,
+    dname,
+    branchname
+FROM
+        emp e 
+    join 
+        dept d 
+    on 
+        e.deptno=d.deptno
+    join
+        branch b
+    on
+        b.branchno=d.branchno
+    order by b.branchno;
+======================
+
+SELECT
+    name
+FROM
+    customers c
+WHERE
+    EXISTS (
+        SELECT
+            1
+        FROM
+            orders
+        WHERE
+            customer_id = c.customer_id
+    )
+ORDER BY
+    name;
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+####08-FEB-22
+1. Views
+--------------------------------------------------------------------------------------#################
+-- vw_EMP			: empno,ename,job,mgr,hiredate,sal,comm,deptno
+--------------------------------------------------------------------------------------#################
+CREATE VIEW vw_emp
+	AS
+			SELECT
+				empno,ename,job,mgr,hiredate,sal,comm,deptno
+			FROM
+				emp;
+
+SELECT * FROM vw_emp;	
+--------------------------------------------------------------------------------------#################
+--vw_hr		: empno,ename,job,mgr,hiredate,sal,comm,deptno
+--------------------------------------------------------------------------------------#################
+CREATE VIEW vw_hr
+	AS
+			SELECT
+				empno,ename,job,mgr,hiredate,sal,comm,deptno
+			FROM 
+				emp;  
+--------------------------------------------------------------------------------------#################
+--vw_other_emp: empno,ename,job,mgr,deptno 	  
+--------------------------------------------------------------------------------------#################
+CREATE VIEW vw_other_emp
+	AS
+			SELECT
+				empno,ename,job,mgr,deptno
+			FROM 
+				emp;
+
+SELECT * FROM vw_emp;
+SELECT * FROM vw_hr;
+SELECT * FROM vw_other_emp;
+--------------------------------------------------------------------------------------#################
+When to use the Oracle view
+You can use views in many cases for different purposes. The most common uses of views are as follows:
+
+Simplifying data retrieval.
+Maintaining logical data independence.
+Implementing data security.
+--------------------------------------------------------------------------------------#################
+
+--------------------------------------------------------------------------------------#################
+-- vw_EMP			: empno,ename,job,mgr,hiredate,sal,comm,deptno
+--------------------------------------------------------------------------------------#################
+CREATE VIEW vw_emp
+	AS
+			SELECT
+				empno,ename,job,mgr,hiredate,sal,comm,deptno
+			FROM
+				emp;
+
+SELECT * FROM vw_emp;	
+--------------------------------------------------------------------------------------#################
+--vw_hr		: empno,ename,job,mgr,hiredate,sal,comm,deptno
+--------------------------------------------------------------------------------------#################
+CREATE VIEW vw_hr
+	AS
+			SELECT
+				empno,ename,job,mgr,hiredate,sal,comm,deptno
+			FROM 
+				emp;
+--------------------------------------------------------------------------------------#################
+--vw_other_emp: empno,ename,job,mgr,deptno 	  
+--------------------------------------------------------------------------------------#################
+CREATE VIEW vw_other_emp
+	AS
+			SELECT
+				empno,ename,job,mgr,deptno
+			FROM 
+				emp;
+
+SELECT * FROM vw_emp;
+SELECT * FROM vw_hr;
+SELECT * FROM vw_other_emp;
+--------------------------------------------------------------------------------------#################
+--1. IF YOUR VIEW WORKS ON ONLY ONE TABLE 
+--2. YOU CAN PERFROM DML OPERATIONS IN BELOW CASES
+--    1. IT HAS ALL COLUMNS AND ALL RECORDS 
+--    2. IT HAS ALL COLUMNS AND RESTRICTED RECORDS 
+--    2. IT HAS ALL COLUMNS AND ALL/RESTRICTED RECORDS BUT HAVE CHECK CONSTRAINT
+--------------------------------------------------------------------------------------#################
+--    1. IT HAS ALL COLUMNS AND ALL RECORDS 
+--  UPDATE THE SAL OF EMP IN  DEPT 10 BY 10%
+--7782	CLARK	MANAGER	7839	09-JUN-81	2450		10
+--7934	MILLER	CLERK	7782	23-JAN-82	1300		10
+--------------------------------------------------------------------------------------#################
+SELECT * FROM vw_hr WHERE deptno=10;
+
+UPDATE vw_hr
+    SET 
+        SAL=SAL+SAL*0.10
+    WHERE
+        deptno=10;
+        
+
+SELECT * FROM vw_hr WHERE deptno=10;
+
+INSERT INTO vw_hr values(1234,'Janhavi','CLERK',7782,
+                        to_date('09-JUN-1992','DD-MM-YYYY'),
+                        1300,0,10)
+
+SELECT * FROM vw_hr WHERE deptno=10;
+
+DELETE FROM vw_hr  WHERE empno=1234;
+
+SELECT * FROM vw_hr WHERE deptno=10;    
+SELECT * FROM emp WHERE deptno=10;  
+rollback;
+SELECT * FROM vw_hr WHERE deptno=10;    
+SELECT * FROM emp WHERE deptno=10;  
+
+--------------------------------------------------------------------------------------#################
+--    2. IT HAS ALL COLUMNS AND RESTRICTED RECORDS 
+--  Create a view to access employees working in SALES
+--------------------------------------------------------------------------------------#################
+CREATE VIEW vw_sales_emp
+    AS 
+    SELECT 
+        empno,ename,job,mgr,hiredate,sal,comm,deptno
+    FROM
+        emp 
+    WHERE
+        deptno=(SELECT DEPTNO FROM DEPT WHERE DNAME='SALES');
+
+UPDATE vw_sales_emp
+    SET 
+        COMM=NVL(COMM,0)+100
+    
+SELECT * FROM vw_sales_emp;
+-- AS VIEW DO NOT HAVE ACCESS TO THE RECORDS HAVIG DEPTNO=10 NO CHANGES APPLIED
+--UPDATE vw_sales_emp
+--    SET 
+--        COMM=NVL(COMM,0)+100
+--    WHERE DEPTNO=10
+
+
+--VIEW CAN INSERT RECORD FOR DEPTNO=10
+INSERT INTO vw_sales_emp VALUES(1234,'Janhavi','CLERK',7782,
+                        to_date('09-JUN-1992','DD-MM-YYYY'),
+                        1300,0,10)
+
+
+SELECT * FROM EMP WHERE DEPTNO=10;
+ROLLBACK;
+
+--vw_sales_emp should not add records of deptno=10
+--to achieve this we must put check on it
+
+
+
+
+
+--------------------------------------------------------------------------------------#################
+-- vw_EMP			: empno,ename,job,mgr,hiredate,sal,comm,deptno
+--------------------------------------------------------------------------------------#################
+CREATE VIEW vw_emp
+	AS
+			SELECT
+				empno,ename,job,mgr,hiredate,sal,comm,deptno
+			FROM
+				emp;
+
+SELECT * FROM vw_emp;	
+--------------------------------------------------------------------------------------#################
+--vw_hr		: empno,ename,job,mgr,hiredate,sal,comm,deptno
+--------------------------------------------------------------------------------------#################
+CREATE VIEW vw_hr
+	AS
+			SELECT
+				empno,ename,job,mgr,hiredate,sal,comm,deptno
+			FROM 
+				emp;
+--------------------------------------------------------------------------------------#################
+--vw_other_emp: empno,ename,job,mgr,deptno 	  
+--------------------------------------------------------------------------------------#################
+CREATE VIEW vw_other_emp
+	AS
+			SELECT
+				empno,ename,job,mgr,deptno
+			FROM 
+				emp;
+
+SELECT * FROM vw_emp;
+SELECT * FROM vw_hr;
+SELECT * FROM vw_other_emp;
+--------------------------------------------------------------------------------------#################
+--1. IF YOUR VIEW WORKS ON ONLY ONE TABLE 
+--2. YOU CAN PERFROM DML OPERATIONS IN BELOW CASES
+--    1. IT HAS ALL COLUMNS AND ALL RECORDS 
+--    2. IT HAS ALL COLUMNS AND RESTRICTED RECORDS 
+--    2. IT HAS ALL COLUMNS AND ALL/RESTRICTED RECORDS BUT HAVE CHECK CONSTRAINT
+--------------------------------------------------------------------------------------#################
+--    1. IT HAS ALL COLUMNS AND ALL RECORDS 
+--  UPDATE THE SAL OF EMP IN  DEPT 10 BY 10%
+--7782	CLARK	MANAGER	7839	09-JUN-81	2450		10
+--7934	MILLER	CLERK	7782	23-JAN-82	1300		10
+--------------------------------------------------------------------------------------#################
+SELECT * FROM vw_hr WHERE deptno=10;
+
+UPDATE vw_hr
+    SET 
+        SAL=SAL+SAL*0.10
+    WHERE
+        deptno=10;
+        
+
+SELECT * FROM vw_hr WHERE deptno=10;
+
+INSERT INTO vw_hr values(1234,'Janhavi','CLERK',7782,
+                        to_date('09-JUN-1992','DD-MM-YYYY'),
+                        1300,0,10)
+
+SELECT * FROM vw_hr WHERE deptno=10;
+
+DELETE FROM vw_hr  WHERE empno=1234;
+
+SELECT * FROM vw_hr WHERE deptno=10;    
+SELECT * FROM emp WHERE deptno=10;  
+rollback;
+SELECT * FROM vw_hr WHERE deptno=10;    
+SELECT * FROM emp WHERE deptno=10;  
+
+--------------------------------------------------------------------------------------#################
+--    2. IT HAS ALL COLUMNS AND RESTRICTED RECORDS 
+--  Create a view to access employees working in SALES
+--------------------------------------------------------------------------------------#################
+CREATE VIEW vw_sales_emp
+    AS 
+    SELECT 
+        empno,ename,job,mgr,hiredate,sal,comm,deptno
+    FROM
+        emp 
+    WHERE
+        deptno=(SELECT DEPTNO FROM DEPT WHERE DNAME='SALES');
+
+UPDATE vw_sales_emp
+    SET 
+        COMM=NVL(COMM,0)+100
+    
+SELECT * FROM vw_sales_emp;
+-- AS VIEW DO NOT HAVE ACCESS TO THE RECORDS HAVIG DEPTNO=10 NO CHANGES APPLIED
+--UPDATE vw_sales_emp
+--    SET 
+--        COMM=NVL(COMM,0)+100
+--    WHERE DEPTNO=10
+
+
+--VIEW CAN INSERT RECORD FOR DEPTNO=10
+INSERT INTO vw_sales_emp VALUES(1234,'Janhavi','CLERK',7782,
+                        to_date('09-JUN-1992','DD-MM-YYYY'),
+                        1300,0,10)
+
+
+SELECT * FROM EMP WHERE DEPTNO=10;
+ROLLBACK;
+--------------------------------------------------------------------------------------#################
+-- SINCE VIEW HAS SUBQUERY AND CHECK OPTION WE GET VIRTUAL COLUMN ERROR 
+--------------------------------------------------------------------------------------#################
+  CREATE OR REPLACE FORCE EDITIONABLE VIEW "C##ERPUSER"."VW_SALES_EMP" ("EMPNO", "ENAME", "JOB", "MGR", "HIREDATE", "SAL", "COMM", "DEPTNO") AS 
+  SELECT 
+        empno,ename,job,mgr,hiredate,sal,comm,deptno
+    FROM
+        emp 
+    WHERE
+        deptno=(SELECT deptno FROM dept WHERE dname='SALES') WITH CHECK OPTION;
+--------------------------------------------------------------------------------------#################
+--VIEW CAN NOT INSERT RECORD FOR DEPTNO=10 CAUSE OF VIRTUAL COLUMN ERROR
+--Error report -
+--SQL Error: ORA-01733: virtual column not allowed here
+--01733. 00000 -  "virtual column not allowed here"
+--*Cause:    
+--*Action:
+--------------------------------------------------------------------------------------#################
+INSERT INTO vw_sales_emp (EMPNO,ENAME,JOB,MGR,HIREDATE,SAL,COMM,DEPTNO)
+VALUES(1234,'Janhavi','CLERK',7782,
+                        to_date('09-JUN-1992','DD-MM-YYYY'),
+                        1300,0,10)
+
+SELECT * FROM EMP WHERE DEPTNO=10;
+--------------------------------------------------------------------------------------#################
+--CREATE VIEW WITHOUT SUBQUERY 
+--to achieve this we must put WITH CHECK OPTION ON SPECIFIC DEPTNO
+--------------------------------------------------------------------------------------#################
+  CREATE OR REPLACE FORCE EDITIONABLE VIEW "C##ERPUSER"."VW_SALES_EMP" ("EMPNO", "ENAME", "JOB", "MGR", "HIREDATE", "SAL", "COMM", "DEPTNO") AS 
+  SELECT 
+        empno,ename,job,mgr,hiredate,sal,comm,deptno
+    FROM
+        emp 
+    WHERE
+        deptno=30 WITH CHECK OPTION;
+--------------------------------------------------------------------------------------#################        
+--vw_sales_emp should not add records of deptno=10
+--Error report -
+--ORA-01402: view WITH CHECK OPTION where-clause violation
+--------------------------------------------------------------------------------------#################
+INSERT INTO vw_sales_emp (EMPNO,ENAME,JOB,MGR,HIREDATE,SAL,COMM,DEPTNO)
+VALUES(1234,'Janhavi','CLERK',7782,
+                        to_date('09-JUN-1992','DD-MM-YYYY'),
+                        1300,0,30)
+
+
+--------------------------------------------------------------------------------------#################
+-- Drop view
+--------------------------------------------------------------------------------------#################
+
+SELECT * FROM vw_emp;
+
+DROP VIEW vw_emp;
+
+--------------------------------------------------------------------------------------#################
+-- Display 5 employees on the basis salary from higest to the lowest
+--------------------------------------------------------------------------------------#################
+SELECT
+    empno,ename,deptno,sal
+FROM
+    emp
+ORDER BY 
+    sal desc;
+--------------------------------------------------------------------------------------#################
+-- Above query gives 15 records order by sal in desc
+-- we need top 5 records
+--------------------------------------------------------------------------------------#################
+SELECT
+    *
+FROM
+    (   SELECT
+            empno,ename,deptno,sal
+        FROM
+            emp
+        ORDER BY 
+            sal desc
+    )
+WHERE 
+    ROWNUM <= 5;
+    
+    
+SELECT
+    *
+FROM
+    (   SELECT
+            empno,ename,deptno,sal
+        FROM
+            emp
+        ORDER BY 
+            sal ASC
+    )
+WHERE 
+    ROWNUM = 2 ;    
+    
+--------------------------------------------------------------------------------------#################
+--C) LATERAL inline view example 
+-- dept(dname),branch(branchname) WITHOUT LATERAL
+--------------------------------------------------------------------------------------#################
+SELECT
+    dname,branchname
+from
+    dept d,
+    (
+        SELECT  * FROM BRANCH b
+        WHERE 
+            b.branchno=d.branchno        
+    )
+ORDER BY dname;
+--------------------------------------------------------------------------------------#################
+-- above query can't idetify the dept d declare outside the inlinview
+--ORA-00904: "D"."BRANCHNO": invalid identifier
+--00904. 00000 -  "%s: invalid identifier"
+--*Cause:    
+--*Action:
+--Error at Line: 318 Column: 24
+--------------------------------------------------------------------------------------#################
+--C) LATERAL inline view example 
+-- dept(dname),branch(branchname) WITH LATERAL ON INLINEVIEW
+--------------------------------------------------------------------------------------#################
+SELECT
+    dname,branchname
+from
+    dept d,
+    LATERAL(
+        SELECT  * FROM BRANCH b
+        WHERE 
+            b.branchno=d.branchno        
+    )
+ORDER BY dname;
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#### 09-Feb-22
+1. UNION,UNION ALL,INTERSECTS
+2. INDEX
+-- HIGHEST 
+SELECT DEPTNO,MAX(SAL) FROM EMP GROUP BY DEPTNO;
+-- LOWEST 
+SELECT DEPTNO,MIN(SAL) FROM EMP GROUP BY DEPTNO;
+
+-- MAX(SAL) AS WELL AS MIN(SAL) 
+SELECT DEPTNO,MAX(SAL),MIN(SAL) FROM EMP GROUP BY DEPTNO;
+--#######################################################
+--10   1300  LOW  
+--10   2450  HIGH
+--20    800  LOW  
+--20   3000  HIGH
+--30    950  LOW
+--30   3000  HIGH
+--NULL 5000  LOW
+--NULL 5000  HIGH
+--#######################################################
+-- UNION
+SELECT E.DEPTNO,ENAME,DNAME FROM 
+EMP E JOIN DEPT D ON E.DEPTNO=D.DEPTNO
+--#######################################################
+SELECT * FROM
+    (
+    SELECT DEPTNO,MIN(SAL),'LOW' AS MESSAGE FROM EMP GROUP BY DEPTNO
+    UNION
+    SELECT DEPTNO,MAX(SAL),'HIGH'AS MESSAGE FROM EMP GROUP BY DEPTNO
+    )
+ORDER BY DEPTNO;
+-- 2ND HIGHEST SALARY 
+SELECT * FROM
+(
+SELECT * FROM (SELECT DEPTNO,MAX(SAL) FROM EMP GROUP BY DEPTNO) WHERE ROWNUM<=2
+) 
+FETCH NEXT 1 ROW ONLY
+
+-- SECOND HIGHEST SAL IN EMP
+SELECT * FROM
+(
+SELECT DEPTNO,SAL FROM EMP ORDER BY SAL DESC
+) 
+FETCH NEXT 1 ROW ONLY;
+
+
+-- FIRST AND SECOND HIGHEST SAL
+SELECT * FROM (SELECT DEPTNO,SAL FROM EMP ORDER BY SAL DESC) WHERE ROWNUM <=2;
+-- FIRST AND SECOND LOWEST SAL
+SELECT * FROM (SELECT DEPTNO,SAL FROM EMP ORDER BY SAL ASC) WHERE ROWNUM <=2;
+
+SELECT * FROM (SELECT DEPTNO,SAL FROM EMP ORDER BY SAL DESC) WHERE ROWNUM <=2
+UNION
+SELECT * FROM (SELECT DEPTNO,SAL FROM EMP ORDER BY SAL ASC) WHERE ROWNUM <=2;
+
+-- employee table find the ename with largest length and smallest length
+-- print the name with length value.
+
+
+SELECT 
+    ENAME,LENGTH(ENAME)
+FROM
+    EMP
+ORDER BY LENGTH(ENAME);
+
+-- employee table find the ename with largest length and smallest length
+-- print the name with length value.
+-- NAME SHOULD BE SORTED ALPHABETICALLY FOR THE LENGTH(ENAME)
+SELECT 
+    ENAME,LENGTH(ENAME)
+FROM
+    EMP
+ORDER BY LENGTH(ENAME),ENAME;
+
+-- UNION OF ENAME WITH SMALL LENGTH AND ENAME WITH BIGGER LENGTH
+SELECT * FROM (SELECT ENAME,LENGTH(ENAME) FROM EMP ORDER BY LENGTH(ENAME),ENAME) WHERE ROWNUM<2;
+SELECT * FROM (SELECT ENAME,LENGTH(ENAME) FROM EMP ORDER BY LENGTH(ENAME) DESC,ENAME) WHERE ROWNUM<2;
+
+SELECT * FROM (SELECT ENAME,LENGTH(ENAME) FROM EMP ORDER BY LENGTH(ENAME),ENAME) WHERE ROWNUM<=2
+UNION 
+SELECT * FROM (SELECT ENAME,LENGTH(ENAME) FROM EMP ORDER BY LENGTH(ENAME) DESC,ENAME) WHERE ROWNUM<=2
+
+
+SELECT * FROM (SELECT ENAME,LENGTH(ENAME) FROM EMP ORDER BY LENGTH(ENAME)DESC,ENAME) WHERE ROWNUM<=2
+UNION 
+SELECT * FROM (SELECT ENAME,LENGTH(ENAME) FROM EMP ORDER BY LENGTH(ENAME) DESC,ENAME) WHERE ROWNUM<=2
+
+
+
+SELECT * FROM (SELECT ENAME,LENGTH(ENAME) FROM EMP ORDER BY LENGTH(ENAME)DESC,ENAME) WHERE ROWNUM<=2
+UNION ALL
+SELECT * FROM (SELECT ENAME,LENGTH(ENAME) FROM EMP ORDER BY LENGTH(ENAME) DESC,ENAME) WHERE ROWNUM<=2
+
+
+--- Lateral
+SELECT
+    DNAME, BRANCHNAME
+FROM 
+    DEPT d JOIN BRANCH b
+    ON  d.branchno=b.branchno;
+--------------------------- In line view
+-- 1. BRANCH ALL DETAILS 
+SELECT BRANCHNO,BRANCHNAME,LOCATION FROM BRANCH;
+-- 2. COMBINE WITH DNAME,BRANCHNAME WITH DEPT.BRANCHNO=BRANCH.BRANCHNO
+
+--SELECT DNAME,BRANCHNAME
+--    FROM DEPT,BRANCH
+--    WHERE DEPT.BRANCHNO=BRANCH.BRANCHNO;
+-- INLINE VIEW
+
+SELECT 
+        DNAME,BRANCHNAME
+    FROM DEPT d, Lateral(SELECT * FROM BRANCH b where b.branchno=d.branchno);
+    
+--===============================================================
+--INDEX
+--==================================================================
+-- TO CHECK THE EXECUTION PLAN OF A QUERY 
+EXPLAIN PLAN FOR SELECT * FROM EMP WHERE EMPNO=7844;
+SELECT 
+    PLAN_TABLE_OUTPUT 
+FROM 
+    TABLE(DBMS_XPLAN.DISPLAY());
+
+EXPLAIN PLAN FOR SELECT * FROM EMP WHERE ename='KING';
+SELECT 
+    PLAN_TABLE_OUTPUT 
+FROM 
+    TABLE(DBMS_XPLAN.DISPLAY());
+    
+--  APPLICATION USES EMP TABLE WHERE EMPNO IS PRIMARY KEY
+--  HOWEVER MOST SEARCH HAPPENS ON ENAME  
+-- CREATE INDEX ON COLUMN WHICH IS USED MORE IN WHERE CLAUSES
+
+--CREATE INDEX index_name 
+--ON table_name(column1[,column2,...])
+
+CREATE INDEX i_emp_ename
+ON EMP(ENAME);
+
+EXPLAIN PLAN FOR SELECT * FROM EMP WHERE ename='KING';
+SELECT 
+    PLAN_TABLE_OUTPUT 
+FROM 
+    TABLE(DBMS_XPLAN.DISPLAY());
+
+-- DEPTNO - FK IN EMP 
+-- DO WE HAVE INDEX ON FK IN ORACLE=>NO
+-- IS DEPTNO PART OF WHERE CLAUSE VERY OFTEN
+-- DO YOU THINK WE WILL NEED INDEX ON DEPTNO ->YES
+
+EXPLAIN PLAN FOR SELECT * FROM EMP WHERE DEPTNO=30;
+SELECT 
+    PLAN_TABLE_OUTPUT 
+FROM 
+    TABLE(DBMS_XPLAN.DISPLAY());
+
+CREATE INDEX i_emp_deptnofk
+on EMP(deptno)
+
+EXPLAIN PLAN FOR SELECT * FROM EMP WHERE DEPTNO=30;
+SELECT 
+    PLAN_TABLE_OUTPUT 
+FROM 
+    TABLE(DBMS_XPLAN.DISPLAY());
+--------------------------------------------------------------------------------------#############
+CREATE TABLE members(
+    member_id INT GENERATED BY DEFAULT AS IDENTITY,
+    first_name VARCHAR2(100) NOT NULL,
+    last_name VARCHAR2(100) NOT NULL,
+    gender CHAR(1) NOT NULL,
+    dob DATE NOT NULL,
+    email VARCHAR2(255) NOT NULL,
+    PRIMARY KEY(member_id)
+);
+
+select count(*) from members;
+--####################################################
+select * from all_indexes
+WHERE 
+    table_name = 'MEMBERS';
+--####################################################
+
+SELECT 
+    index_name, 
+    index_type, 
+    visibility, 
+    status 
+FROM 
+    all_indexes
+WHERE 
+    table_name = 'MEMBERS'
+    and
+    table_owner='C##ERPUSER';
+
+--####################################################
+create index i_members_lastname
+on members(last_name);
+
+drop index i_members_lastname;
+    
+DROP INDEX MEMBERS_GENDER_I;    
+
+create index i_members_name
+on members(first_name,last_name);
+
+drop index i_emp_deptnofk;
+
+create unique index iu_emp_deptno
+on emp(deptno)
+
+
+select empno,deptno from emp order by deptno;
+
+create unique index i_emp_empno
+on emp(empno);
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#### 10-FEB-22
+1. REVISION ON JOIN, UNION,UNIONALL, INTERSECT,MINUS, INDEX
+2. SYNONYME,SEQUENCE,ROLES,PROFILE
+SELECT DEPTNO FROM EMP
+UNION
+SELECT DEPTNO FROM DEPT;
+
+SELECT DEPTNO FROM EMP
+UNION ALL
+SELECT DEPTNO FROM DEPT;
+
+
+SELECT DEPTNO FROM EMP
+INTERSECT
+SELECT DEPTNO FROM DEPT;
+
+SELECT DEPTNO FROM EMP
+MINUS
+SELECT DEPTNO FROM DEPT;
+
+SELECT DEPTNO FROM DEPT
+MINUS
+SELECT DEPTNO FROM EMP;
+
+--data is case sensitive
+SELECT * FROM EMP WHERE ENAME='kING';
+SELECT ename,lower(ename) FROM EMP 
+WHERE lower(ENAME)=lower('kING')
+
+SELECT ename,lower(ename) FROM EMP 
+order by lower(ename);
+
+EXPLAIN PLAN FOR
+SELECT * FROM EMP WHERE ENAME='KING';
+
+SELECT 
+    PLAN_TABLE_OUTPUT 
+FROM 
+    TABLE(DBMS_XPLAN.DISPLAY());
+
+EXPLAIN PLAN FOR
+SELECT * FROM EMP WHERE LOWER(ENAME)=LOWER('KING');
+
+SELECT 
+    PLAN_TABLE_OUTPUT 
+FROM 
+    TABLE(DBMS_XPLAN.DISPLAY());
+
+
+CREATE INDEX i_emp_lower_ename
+on emp(lower(ename));
+
+EXPLAIN PLAN FOR
+SELECT * FROM EMP WHERE LOWER(ENAME)=LOWER('KING');
+
+SELECT 
+    PLAN_TABLE_OUTPUT 
+FROM 
+    TABLE(DBMS_XPLAN.DISPLAY());
+
+
+-- WHICH COLUMN HAS LOW CARDINALITY IN MEMBERS
+SELECT gender,count(member_id) from members group by gender;
+SELECT dob,count(member_id) from members group by dob;
+select first_name ,count(member_id) from members group by first_name; 
+select last_name ,count(member_id) from members group by last_name; 
+select email ,count(member_id) from members group by email; 
+
+EXPLAIN PLAN FOR
+SELECT * FROM MEMBERS WHERE GENDER='M';
+
+SELECT 
+    PLAN_TABLE_OUTPUT 
+FROM 
+    TABLE(DBMS_XPLAN.DISPLAY());
+
+--MEMBERS [998] 
+--=>M[509] 
+--=>F[489] 
+CREATE BITMAP INDEX i_members_gender
+on MEMBERS (GENDER);
+
+EXPLAIN PLAN FOR
+SELECT * FROM MEMBERS WHERE GENDER='M';
+
+SELECT 
+    PLAN_TABLE_OUTPUT 
+FROM 
+    TABLE(DBMS_XPLAN.DISPLAY());
+
+
+
+
+
+
+
